@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 
@@ -10,13 +10,13 @@ type StatusGaji  = "Sudah Dibayar" | "Belum Dibayar" | "Proses";
 
 interface RiwayatGaji {
   id: string;
-  periode: string;          // "Mei 2026"
+  periode: string;
   hadir: number;
   telat: number;
   lembur_jam: number;
   gaji_pokok: number;
   tarif_lembur: number;
-  potongan_telat: number;   // per kejadian telat
+  potongan_telat: number;
   total_gaji: number;
   status: StatusGaji;
   tanggal_bayar: string | null;
@@ -25,8 +25,8 @@ interface RiwayatGaji {
 
 interface PengaturanGaji {
   gaji_pokok: number;
-  tarif_lembur: number;     // per jam
-  tanggal_gajian: number;   // 1–31
+  tarif_lembur: number;
+  tanggal_gajian: number;
   metode_bayar: MetodeBayar;
   nama_bank: string;
   nomor_rekening: string;
@@ -150,7 +150,6 @@ function ModalDetail({
   return (
     <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
       <div className="slip-card">
-        {/* Slip header */}
         <div className="slip-top">
           <div className="slip-logo">💼</div>
           <div>
@@ -163,7 +162,6 @@ function ModalDetail({
         <div className="slip-name">{nama}</div>
         <div className="slip-divider" />
 
-        {/* Kehadiran */}
         <div className="slip-section-label">Kehadiran</div>
         <div className="slip-rows">
           <div className="slip-row"><span>Hari Hadir</span><span>{r.hadir} hari</span></div>
@@ -173,7 +171,6 @@ function ModalDetail({
 
         <div className="slip-divider" />
 
-        {/* Rincian */}
         <div className="slip-section-label">Rincian Gaji</div>
         <div className="slip-rows">
           <div className="slip-row">
@@ -257,7 +254,7 @@ function ModalDetail({
   );
 }
 
-// ─── Modal Tambah Gaji (Hitung & Catat) ──────────────────────────────────────
+// ─── Modal Tambah Gaji ────────────────────────────────────────────────────────
 function ModalTambahGaji({
   pengaturan, onClose, onSave,
 }: {
@@ -301,14 +298,13 @@ function ModalTambahGaji({
             <div className="mh-icon"><ICalc /></div>
             <div>
               <h2>Tambah Catatan Gaji</h2>
-              <p>Masukkan data kehadiran & hitung gaji</p>
+              <p>Masukkan data kehadiran &amp; hitung gaji</p>
             </div>
           </div>
           <button className="btn-icon-sm" onClick={onClose}><IX /></button>
         </div>
 
         <div className="mform">
-          {/* Periode */}
           <div className="mfield">
             <label>Periode Gaji</label>
             <select value={periode} onChange={e => setPeriode(e.target.value)}>
@@ -316,7 +312,6 @@ function ModalTambahGaji({
             </select>
           </div>
 
-          {/* Kehadiran row */}
           <div className="mrow">
             <div className="mfield">
               <label>Hari Hadir</label>
@@ -329,7 +324,6 @@ function ModalTambahGaji({
             </div>
           </div>
 
-          {/* Lembur */}
           <div className="mfield">
             <label>Jam Lembur</label>
             <div className="lembur-input">
@@ -338,7 +332,6 @@ function ModalTambahGaji({
             </div>
           </div>
 
-          {/* Kalkulasi preview */}
           <div className="calc-preview">
             <div className="calc-row"><span>Gaji Pokok</span><span>{IDR(pengaturan.gaji_pokok)}</span></div>
             <div className="calc-row plus"><span>+ Lembur</span><span>{IDR(lembur_total)}</span></div>
@@ -349,7 +342,6 @@ function ModalTambahGaji({
             <div className="calc-row total"><span>Total Gaji</span><span>{IDR(total_gaji)}</span></div>
           </div>
 
-          {/* Status */}
           <div className="mrow">
             <div className="mfield">
               <label>Status Pembayaran</label>
@@ -367,7 +359,6 @@ function ModalTambahGaji({
             )}
           </div>
 
-          {/* Catatan */}
           <div className="mfield">
             <label>Catatan (opsional)</label>
             <textarea rows={2} placeholder="cth. Bonus akhir tahun..." value={catatan} onChange={e => setCatatan(e.target.value)} />
@@ -375,7 +366,7 @@ function ModalTambahGaji({
 
           <div className="mactions">
             <button className="btn-secondary" onClick={onClose}>Batal</button>
-            <button className="btn-primary" onClick={handleSave}><ISave /> Simpan & Catat</button>
+            <button className="btn-primary" onClick={handleSave}><ISave /> Simpan &amp; Catat</button>
           </div>
         </div>
       </div>
@@ -420,14 +411,19 @@ function ModalTambahGaji({
   );
 }
 
-// ─── Main Page ────────────────────────────────────────────────────────────────
-export default function GajiPage() {
+// ─── Inner page (uses useSearchParams) ───────────────────────────────────────
+function GajiPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const userId = searchParams.get("id");
 
-  const [karyawan, setKaryawan] = useState<KaryawanInfo | null>(null);
-  const [tab, setTab]             = useState<"info"|"riwayat"|"slip"|"pengaturan">("info");
+  const [karyawan, setKaryawan]     = useState<KaryawanInfo | null>(null);
+  const [tab, setTab]               = useState<"info"|"riwayat"|"slip"|"pengaturan">("info");
+  const [riwayat, setRiwayat]       = useState<RiwayatGaji[]>(MOCK_RIWAYAT);
+  const [pengaturan, setPengaturan] = useState<PengaturanGaji>(MOCK_PENGATURAN);
+  const [modalDetail, setModalDetail] = useState<RiwayatGaji | null>(null);
+  const [modalTambah, setModalTambah] = useState(false);
+  const [pg, setPg]                 = useState({ ...MOCK_PENGATURAN });
 
   useEffect(() => {
     if (!userId || typeof window === "undefined") return;
@@ -460,17 +456,8 @@ export default function GajiPage() {
       }
     };
 
-    loadKaryawan();
+    void loadKaryawan();
   }, [userId]);
-  const [riwayat, setRiwayat]     = useState<RiwayatGaji[]>(MOCK_RIWAYAT);
-  const [pengaturan, setPengaturan] = useState<PengaturanGaji>(MOCK_PENGATURAN);
-
-  // Modals
-  const [modalDetail, setModalDetail]         = useState<RiwayatGaji | null>(null);
-  const [modalTambah, setModalTambah]         = useState(false);
-
-  // Pengaturan form state
-  const [pg, setPg] = useState({ ...MOCK_PENGATURAN });
 
   const handleSavePengaturan = () => {
     setPengaturan({ ...pg });
@@ -538,7 +525,6 @@ export default function GajiPage() {
             <span>{karyawan.email}</span>
           </div>
         </div>
-        {/* quick stats */}
         <div className="emp-stats">
           <div className="emp-stat">
             <span className="emp-stat-num">{IDR(pengaturan.gaji_pokok)}</span>
@@ -573,9 +559,7 @@ export default function GajiPage() {
         ))}
       </div>
 
-      {/* ════════════════════════════════════════════════════════════
-          TAB: INFORMASI GAJI
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* ── TAB: INFORMASI GAJI ─────────────────────────────────── */}
       {tab === "info" && (
         <div className="content glass">
           <div className="info-grid">
@@ -612,21 +596,18 @@ export default function GajiPage() {
               </>
             )}
           </div>
-
           <div className="btn-row">
             <button className="btn-outline" onClick={() => setTab("pengaturan")}>
               <IEdit /> Edit Pengaturan Gaji
             </button>
             <button className="btn-primary-lg" onClick={() => setModalTambah(true)}>
-              <ICalc /> Hitung & Catat Gaji Bulan Ini
+              <ICalc /> Hitung &amp; Catat Gaji Bulan Ini
             </button>
           </div>
         </div>
       )}
 
-      {/* ════════════════════════════════════════════════════════════
-          TAB: RIWAYAT GAJI
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* ── TAB: RIWAYAT GAJI ───────────────────────────────────── */}
       {tab === "riwayat" && (
         <div className="content glass">
           <div className="rw-toolbar">
@@ -675,9 +656,7 @@ export default function GajiPage() {
         </div>
       )}
 
-      {/* ════════════════════════════════════════════════════════════
-          TAB: SLIP GAJI (ringkasan cepat)
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* ── TAB: SLIP GAJI ──────────────────────────────────────── */}
       {tab === "slip" && (
         <div className="content glass">
           <p className="tab-desc">Pilih periode untuk mencetak atau mengirim slip gaji.</p>
@@ -700,9 +679,7 @@ export default function GajiPage() {
         </div>
       )}
 
-      {/* ════════════════════════════════════════════════════════════
-          TAB: PENGATURAN
-      ═══════════════════════════════════════════════════════════════ */}
+      {/* ── TAB: PENGATURAN ─────────────────────────────────────── */}
       {tab === "pengaturan" && (
         <div className="content glass">
           <div className="form-grid">
@@ -775,13 +752,9 @@ export default function GajiPage() {
       <style jsx>{`
         .pg { padding:2rem;max-width:1100px;margin:0 auto;display:flex;flex-direction:column;gap:1.25rem; }
         .glass { background:rgba(15,23,42,0.7);border:1px solid rgba(51,65,85,0.6);border-radius:14px;backdrop-filter:blur(10px); }
-
-        /* Top bar */
         .topbar { display:flex;align-items:center; }
         .btn-back { display:flex;align-items:center;gap:6px;background:none;border:none;color:#64748b;font-size:0.875rem;font-weight:600;cursor:pointer;padding:6px 0;transition:color 0.15s; }
         .btn-back:hover { color:#e2e8f0; }
-
-        /* Emp header */
         .emp-header { padding:1.5rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap; }
         .emp-avatar { width:52px;height:52px;border-radius:14px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);display:flex;align-items:center;justify-content:center;font-size:1.5rem;font-weight:800;color:#a5b4fc;flex-shrink:0; }
         .emp-nama { font-size:1.15rem;font-weight:800;color:#fff;margin-bottom:4px; }
@@ -795,32 +768,22 @@ export default function GajiPage() {
         .emp-stat-num.stat-green { color:#4ade80; }
         .emp-stat-label { font-size:0.7rem;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.4px; }
         .emp-stat-sep { width:1px;height:32px;background:rgba(51,65,85,0.8); }
-
-        /* Tabs */
         .tabs { display:flex;gap:0;overflow-x:auto;padding:0.375rem; }
         .tab-btn { padding:0.6rem 1.25rem;background:none;border:none;border-radius:9px;color:#64748b;font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.2s;white-space:nowrap; }
         .tab-btn:hover { color:#e2e8f0;background:rgba(51,65,85,0.4); }
         .tab-active { background:rgba(99,102,241,0.15)!important;color:#a5b4fc!important;border:1px solid rgba(99,102,241,0.2); }
-
-        /* Content */
         .content { padding:1.5rem; }
         .tab-desc { font-size:0.875rem;color:#64748b;margin:0 0 1.25rem; }
-
-        /* Info grid */
         .info-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;margin-bottom:1.5rem; }
         .info-item { display:flex;flex-direction:column;gap:4px;padding:1rem;background:rgba(15,23,42,0.5);border:1px solid rgba(51,65,85,0.5);border-radius:10px; }
         .info-label { font-size:0.72rem;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:0.5px; }
         .info-val { font-size:1rem;font-weight:700;color:#e2e8f0; }
         .info-unit { font-size:0.78rem;color:#64748b;font-weight:400; }
-
-        /* Buttons */
         .btn-row { display:flex;gap:0.75rem;flex-wrap:wrap; }
         .btn-outline { display:flex;align-items:center;gap:6px;padding:0.7rem 1.25rem;background:transparent;border:1px solid rgba(99,102,241,0.35);border-radius:9px;color:#a5b4fc;font-size:0.875rem;font-weight:600;cursor:pointer;transition:all 0.2s; }
         .btn-outline:hover { background:rgba(99,102,241,0.1); }
         .btn-primary-lg { display:flex;align-items:center;gap:6px;padding:0.7rem 1.3rem;background:#6366f1;border:none;border-radius:9px;color:#fff;font-size:0.875rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,0.3);transition:all 0.2s; }
         .btn-primary-lg:hover { background:#4f46e5;transform:translateY(-1px); }
-
-        /* Riwayat */
         .rw-toolbar { display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:0.75rem; }
         .rw-count { font-size:0.8rem;color:#64748b;font-weight:600; }
         .table-scroll { overflow-x:auto; }
@@ -844,19 +807,14 @@ export default function GajiPage() {
         .status-process::before { background:#fbbf24; }
         .btn-detail { padding:5px 12px;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:6px;color:#a5b4fc;font-size:0.78rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:4px;transition:all 0.15s; }
         .btn-detail:hover { background:rgba(99,102,241,0.2);color:#c7d2fe; }
-
-        /* Slip list */
         .slip-list { display:flex;flex-direction:column;gap:0.75rem; }
         .slip-row-card { display:flex;align-items:center;gap:1rem;padding:1rem 1.25rem;background:rgba(15,23,42,0.5);border:1px solid rgba(51,65,85,0.5);border-radius:10px;flex-wrap:wrap; }
         .slip-row-actions { margin-left:auto;display:flex;gap:6px; }
-
-        /* Form settings */
         .form-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem; }
         .form-field { display:flex;flex-direction:column;gap:5px; }
         .form-field label { font-size:0.78rem;font-weight:700;color:#64748b; }
         .form-field input, .form-field select { padding:0.65rem 0.9rem;background:rgba(15,23,42,0.7);border:1px solid rgba(51,65,85,0.7);border-radius:8px;color:#e2e8f0;font-size:0.875rem;transition:border 0.2s; }
         .form-field input:focus, .form-field select:focus { border-color:#6366f1;outline:none;box-shadow:0 0 0 3px rgba(99,102,241,0.15); }
-
         @media (max-width:768px) {
           .pg { padding:1rem; }
           .emp-stats { display:none; }
@@ -864,5 +822,25 @@ export default function GajiPage() {
         }
       `}</style>
     </div>
+  );
+}
+
+// ─── Default export: bungkus dengan Suspense ─────────────────────────────────
+export default function GajiPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{
+          width: 32, height: 32,
+          border: "3px solid rgba(99,102,241,0.2)",
+          borderTopColor: "#6366f1",
+          borderRadius: "50%",
+          animation: "spin 0.7s linear infinite",
+        }} />
+        <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      </div>
+    }>
+      <GajiPageInner />
+    </Suspense>
   );
 }
