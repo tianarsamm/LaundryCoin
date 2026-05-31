@@ -1,7 +1,7 @@
 // app/login/page.tsx
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase/client";
 
@@ -11,13 +11,14 @@ const ERROR_MESSAGES: Record<string, string> = {
   forbidden:  "Anda tidak memiliki akses ke halaman tersebut.",
 };
 
-export default function LoginPage() {
+// ── Komponen terpisah agar useSearchParams bisa dibungkus Suspense ──────────
+function LoginForm() {
   const router       = useRouter();
   const searchParams = useSearchParams();
   const nextPath     = searchParams.get("next") || "/dashboard";
   const errorParam   = searchParams.get("error");
 
-  const [email,    setEmail]    = useState("");   // ← ganti dari username
+  const [email,    setEmail]    = useState("");
   const [password, setPassword] = useState("");
   const [loading,  setLoading]  = useState(false);
   const [showPass, setShowPass] = useState(false);
@@ -64,7 +65,7 @@ export default function LoginPage() {
     }
 
     // 3. Update last_login (fire and forget)
-    supabase
+    void supabase
       .from("users")
       .update({ last_login: new Date().toISOString() })
       .eq("id", data.user.id);
@@ -75,111 +76,124 @@ export default function LoginPage() {
   };
 
   return (
+    <div className="login-card glass-panel">
+      {/* Logo */}
+      <div className="login-logo">
+        <div className="logo-icon">
+          <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
+            <rect x="4" y="8" width="24" height="18" rx="4" fill="url(#lg)" fillOpacity="0.2"/>
+            <path d="M4 14h24" stroke="url(#lg)" strokeWidth="1.5"/>
+            <circle cx="10" cy="21" r="2.5" fill="url(#lg)" fillOpacity="0.4"/>
+            <circle cx="16" cy="21" r="2.5" fill="url(#lg)"/>
+            <circle cx="22" cy="21" r="2.5" fill="url(#lg)" fillOpacity="0.25"/>
+            <path d="M11 8V6a5 5 0 0110 0v2" stroke="url(#lg)" strokeWidth="1.8" strokeLinecap="round"/>
+            <defs>
+              <linearGradient id="lg" x1="4" y1="6" x2="28" y2="26" gradientUnits="userSpaceOnUse">
+                <stop stopColor="#6366f1"/><stop offset="1" stopColor="#06b6d4"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div>
+          <p className="logo-name">Laundry Coin</p>
+          <p className="logo-sub">PREMIUM FINANCE</p>
+        </div>
+      </div>
+
+      <div className="login-heading">
+        <h1>Masuk ke Sistem</h1>
+        <p>Gunakan email dan password yang diberikan oleh owner</p>
+      </div>
+
+      {/* Error banner */}
+      {error && (
+        <div className="error-box" role="alert">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+            <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8"/>
+            <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
+          {error}
+        </div>
+      )}
+
+      {/* Form */}
+      <form onSubmit={handleLogin} className="form">
+        {/* Email */}
+        <div className="field">
+          <label htmlFor="email">Email</label>
+          <div className="input-wrap">
+            <svg className="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" strokeWidth="1.8"/>
+              <path d="M2 7l10 7 10-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+            <input
+              id="email" type="email" placeholder="cth. budi@gmail.com"
+              value={email} onChange={e => setEmail(e.target.value)}
+              required autoComplete="email" disabled={loading}
+            />
+          </div>
+        </div>
+
+        {/* Password */}
+        <div className="field">
+          <label htmlFor="password">Password</label>
+          <div className="input-wrap">
+            <svg className="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
+              <rect x="5" y="10" width="14" height="11" rx="2" stroke="currentColor" strokeWidth="1.8"/>
+              <path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+              <circle cx="12" cy="15.5" r="1.5" fill="currentColor"/>
+            </svg>
+            <input
+              id="password" type={showPass ? "text" : "password"}
+              placeholder="Masukkan password"
+              value={password} onChange={e => setPassword(e.target.value)}
+              required autoComplete="current-password" disabled={loading}
+            />
+            <button type="button" className="eye-btn"
+              onClick={() => setShowPass(v => !v)} tabIndex={-1}>
+              {showPass
+                ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z" stroke="currentColor" strokeWidth="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/><path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
+                : <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z" stroke="currentColor" strokeWidth="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/></svg>
+              }
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" className="btn-login" disabled={loading}>
+          {loading ? (
+            <><span className="spinner" /> Memverifikasi…</>
+          ) : (
+            <>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
+                <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              Masuk
+            </>
+          )}
+        </button>
+      </form>
+
+      <p className="login-footer">
+        Belum punya akun? Hubungi owner untuk didaftarkan.
+      </p>
+    </div>
+  );
+}
+
+// ── Halaman utama: bungkus LoginForm dengan Suspense ────────────────────────
+export default function LoginPage() {
+  return (
     <div className="login-page">
       <div className="bg-glow glow-1" />
       <div className="bg-glow glow-2" />
 
-      <div className="login-card glass-panel">
-        {/* Logo */}
-        <div className="login-logo">
-          <div className="logo-icon">
-            <svg width="26" height="26" viewBox="0 0 32 32" fill="none">
-              <rect x="4" y="8" width="24" height="18" rx="4" fill="url(#lg)" fillOpacity="0.2"/>
-              <path d="M4 14h24" stroke="url(#lg)" strokeWidth="1.5"/>
-              <circle cx="10" cy="21" r="2.5" fill="url(#lg)" fillOpacity="0.4"/>
-              <circle cx="16" cy="21" r="2.5" fill="url(#lg)"/>
-              <circle cx="22" cy="21" r="2.5" fill="url(#lg)" fillOpacity="0.25"/>
-              <path d="M11 8V6a5 5 0 0110 0v2" stroke="url(#lg)" strokeWidth="1.8" strokeLinecap="round"/>
-              <defs>
-                <linearGradient id="lg" x1="4" y1="6" x2="28" y2="26" gradientUnits="userSpaceOnUse">
-                  <stop stopColor="#6366f1"/><stop offset="1" stopColor="#06b6d4"/>
-                </linearGradient>
-              </defs>
-            </svg>
-          </div>
-          <div>
-            <p className="logo-name">Laundry Coin</p>
-            <p className="logo-sub">PREMIUM FINANCE</p>
-          </div>
+      <Suspense fallback={
+        <div className="login-card glass-panel" style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: 320 }}>
+          <span className="spinner" style={{ width: 28, height: 28, borderWidth: 3 }} />
         </div>
-
-        <div className="login-heading">
-          <h1>Masuk ke Sistem</h1>
-          <p>Gunakan email dan password yang diberikan oleh owner</p>
-        </div>
-
-        {/* Error banner */}
-        {error && (
-          <div className="error-box" role="alert">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8"/>
-              <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-            </svg>
-            {error}
-          </div>
-        )}
-
-        {/* Form */}
-        <form onSubmit={handleLogin} className="form">
-          {/* Email */}
-          <div className="field">
-            <label htmlFor="email">Email</label>
-            <div className="input-wrap">
-              <svg className="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <rect x="2" y="4" width="20" height="16" rx="3" stroke="currentColor" strokeWidth="1.8"/>
-                <path d="M2 7l10 7 10-7" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-              </svg>
-              <input
-                id="email" type="email" placeholder="cth. budi@gmail.com"
-                value={email} onChange={e => setEmail(e.target.value)}
-                required autoComplete="email" disabled={loading}
-              />
-            </div>
-          </div>
-
-          {/* Password */}
-          <div className="field">
-            <label htmlFor="password">Password</label>
-            <div className="input-wrap">
-              <svg className="input-icon" width="15" height="15" viewBox="0 0 24 24" fill="none">
-                <rect x="5" y="10" width="14" height="11" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-                <path d="M8 10V7a4 4 0 018 0v3" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-                <circle cx="12" cy="15.5" r="1.5" fill="currentColor"/>
-              </svg>
-              <input
-                id="password" type={showPass ? "text" : "password"}
-                placeholder="Masukkan password"
-                value={password} onChange={e => setPassword(e.target.value)}
-                required autoComplete="current-password" disabled={loading}
-              />
-              <button type="button" className="eye-btn"
-                onClick={() => setShowPass(v => !v)} tabIndex={-1}>
-                {showPass
-                  ? <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z" stroke="currentColor" strokeWidth="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/><path d="M3 3l18 18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>
-                  : <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M3 12s3.5-7 9-7 9 7 9 7-3.5 7-9 7-9-7-9-7z" stroke="currentColor" strokeWidth="1.8"/><circle cx="12" cy="12" r="3" stroke="currentColor" strokeWidth="1.8"/></svg>
-                }
-              </button>
-            </div>
-          </div>
-
-          <button type="submit" className="btn-login" disabled={loading}>
-            {loading ? (
-              <><span className="spinner" /> Memverifikasi…</>
-            ) : (
-              <>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-                  <path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4M10 17l5-5-5-5M15 12H3" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-                Masuk
-              </>
-            )}
-          </button>
-        </form>
-
-        <p className="login-footer">
-          Belum punya akun? Hubungi owner untuk didaftarkan.
-        </p>
-      </div>
+      }>
+        <LoginForm />
+      </Suspense>
 
       <style jsx>{`
         .login-page { min-height:100vh; display:flex; align-items:center; justify-content:center; padding:1.5rem; position:relative; overflow:hidden; }
@@ -209,7 +223,7 @@ export default function LoginPage() {
         .btn-login:hover:not(:disabled) { background:#4f46e5; transform:translateY(-1px); box-shadow:0 6px 22px rgba(99,102,241,0.4); }
         .btn-login:active:not(:disabled) { transform:translateY(0); }
         .btn-login:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
-        .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; }
+        .spinner { width:16px; height:16px; border:2px solid rgba(255,255,255,0.3); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; display:inline-block; }
         @keyframes spin { to { transform:rotate(360deg); } }
         .login-footer { text-align:center; font-size:0.8rem; color:var(--color-text-muted); margin:0; }
         @media (max-width:440px) { .login-card { padding:2rem 1.25rem; } }
