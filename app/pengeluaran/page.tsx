@@ -1,0 +1,343 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import FormPengeluaran from "@/components/FormPengeluaran";
+import TabelTransaksi from "@/components/TabelTransaksi";
+import { getAllPengeluaran, deletePengeluaran } from "@/lib/supabase/storage";
+import { Pengeluaran } from "@/lib/supabase/types";
+import { formatRupiah } from "@/lib/constants";
+
+export default function PengeluaranPage() {
+  const [data, setData]       = useState<Pengeluaran[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError]     = useState<string | null>(null);
+
+  const loadData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await getAllPengeluaran();
+      setData(result);
+    } catch (err) {
+      setError("Gagal memuat data. Periksa koneksi Anda.");
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    loadData();
+  }, [loadData]);
+
+  const handleDelete = async (id: string) => {
+    // Optimistic update
+    setData((prev) => prev.filter((item) => item.id !== id));
+    const ok = await deletePengeluaran(id);
+    if (!ok) {
+      // Rollback on failure
+      await loadData();
+      setError("Gagal menghapus pengeluaran. Silakan coba lagi.");
+    }
+  };
+
+  const totalPengeluaran = data.reduce((sum, item) => sum + item.jumlah, 0);
+
+  return (
+    <div className="pengeluaran-page">
+      {/* Decorative background glows */}
+      <div className="pengeluaran-bg-glow glow-pengeluaran-1" />
+      <div className="pengeluaran-bg-glow glow-pengeluaran-2" />
+
+      <div className="pengeluaran-container container">
+        {/* ── Header ── */}
+        <header className="page-header">
+          <div>
+            <p className="page-eyebrow">TRANSAKSI KELUAR</p>
+            <h1>Catat Pengeluaran</h1>
+            <p className="page-description">
+              Pantau dan kelola seluruh pengeluaran operasional laundry Anda dengan rapi.
+            </p>
+          </div>
+          <div className="summary-card glass-panel">
+            <span>Total Pengeluaran</span>
+            <strong>{formatRupiah(totalPengeluaran)}</strong>
+          </div>
+        </header>
+
+        {/* ── Error banner ── */}
+        {error && (
+          <div className="error-banner" role="alert">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8"/>
+              <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+            {error}
+            <button className="error-dismiss" onClick={() => setError(null)} aria-label="Tutup">✕</button>
+          </div>
+        )}
+
+        {/* ── Main grid ── */}
+        <div className="pengeluaran-grid">
+          {/* Form */}
+          <section className="form-panel glass-panel">
+            <FormPengeluaran onSuccess={loadData} />
+          </section>
+
+          {/* Table */}
+          <section className="table-panel glass-panel">
+            <div className="table-header">
+              <h2>Riwayat Pengeluaran</h2>
+              <span className="count-badge">
+                {loading ? "…" : `${data.length} item`}
+              </span>
+            </div>
+
+            {loading ? (
+              <div className="loading-state">
+                <div className="spinner" />
+                <p>Memuat data…</p>
+              </div>
+            ) : (
+              <TabelTransaksi
+                mode="pengeluaran"
+                items={data}
+                onDelete={handleDelete}
+              />
+            )}
+          </section>
+        </div>
+      </div>
+
+      <style jsx>{`
+        /* ── Page shell ── */
+        .pengeluaran-page {
+          position: relative;
+          min-height: 100vh;
+          padding: 2.5rem 0 5rem;
+          overflow: hidden;
+        }
+
+        /* ── Decorative glows ── */
+        .pengeluaran-bg-glow {
+          position: fixed;
+          border-radius: 50%;
+          filter: blur(100px);
+          pointer-events: none;
+          z-index: 0;
+          opacity: 0.2;
+          animation: pulse 10s infinite alternate;
+        }
+        .glow-pengeluaran-1 {
+          width: 450px; height: 450px;
+          background: radial-gradient(circle, var(--color-primary), transparent 70%);
+          top: -120px; right: -80px;
+        }
+        .glow-pengeluaran-2 {
+          width: 350px; height: 350px;
+          background: radial-gradient(circle, var(--color-danger), transparent 70%);
+          bottom: 50px; left: -80px;
+          animation-delay: 2s;
+        }
+        @keyframes pulse {
+          0%   { transform: translateY(0) scale(1);    opacity: 0.15; }
+          100% { transform: translateY(15px) scale(1.05); opacity: 0.25; }
+        }
+
+        /* ── Container ── */
+        .pengeluaran-container {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 1.75rem;
+        }
+
+        /* ── Header ── */
+        .page-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          gap: 1.5rem;
+          flex-wrap: wrap;
+        }
+        .page-eyebrow {
+          font-size: 0.72rem;
+          font-weight: 800;
+          color: var(--color-danger);
+          letter-spacing: 2.5px;
+          margin-bottom: 0.4rem;
+        }
+        .page-header h1 {
+          font-family: var(--font-display);
+          font-size: clamp(1.9rem, 3.5vw, 2.75rem);
+          font-weight: 800;
+          color: #ffffff;
+          margin: 0;
+          letter-spacing: -0.8px;
+          line-height: 1.1;
+        }
+        .page-description {
+          color: var(--color-text-muted);
+          margin-top: 0.4rem;
+          max-width: 560px;
+          font-size: 0.93rem;
+        }
+
+        /* ── Summary card ── */
+        .summary-card {
+          padding: 20px 24px;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          min-width: 220px;
+          position: relative;
+          overflow: hidden;
+        }
+        .summary-card::before {
+          content: "";
+          position: absolute;
+          left: 0; top: 0;
+          width: 4px; height: 100%;
+          background: var(--color-danger);
+          border-radius: 4px 0 0 4px;
+        }
+        .summary-card span {
+          color: var(--color-text-muted);
+          font-size: 0.78rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          letter-spacing: 0.8px;
+        }
+        .summary-card strong {
+          font-family: var(--font-display);
+          font-size: 1.6rem;
+          font-weight: 800;
+          color: var(--color-danger);
+          text-shadow: 0 0 12px rgba(244, 63, 94, 0.25);
+        }
+
+        /* ── Error banner ── */
+        .error-banner {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 16px;
+          background: var(--color-danger-dim);
+          border: 1px solid rgba(244, 63, 94, 0.25);
+          border-radius: var(--radius-sm);
+          color: #fda4af;
+          font-size: 0.88rem;
+          font-weight: 500;
+          animation: fadeSlideDown 0.3s ease;
+        }
+        @keyframes fadeSlideDown {
+          from { opacity: 0; transform: translateY(-8px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+        .error-dismiss {
+          margin-left: auto;
+          background: none;
+          border: none;
+          color: inherit;
+          cursor: pointer;
+          opacity: 0.6;
+          font-size: 0.8rem;
+          padding: 0 4px;
+          transition: opacity 0.15s;
+        }
+        .error-dismiss:hover { opacity: 1; }
+
+        /* ── Grid layout ── */
+        .pengeluaran-grid {
+          display: grid;
+          grid-template-columns: 340px minmax(0, 1fr);
+          gap: 1.5rem;
+          align-items: start;
+        }
+
+        /* ── Panels ── */
+        .form-panel,
+        .table-panel {
+          padding: 24px;
+        }
+
+        /* ── Table header ── */
+        .table-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 1.25rem;
+          gap: 1rem;
+        }
+        .table-header h2 {
+          margin: 0;
+          font-family: var(--font-display);
+          font-size: 1.1rem;
+          font-weight: 700;
+          color: #ffffff;
+        }
+        .count-badge {
+          color: var(--color-text-muted);
+          font-size: 0.82rem;
+          font-weight: 600;
+          background: rgba(255, 255, 255, 0.04);
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          padding: 3px 10px;
+          border-radius: 99px;
+          white-space: nowrap;
+        }
+
+        /* ── Loading state ── */
+        .loading-state {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 12px;
+          padding: 4rem 1rem;
+          color: var(--color-text-muted);
+          font-size: 0.88rem;
+        }
+        .spinner {
+          width: 32px; height: 32px;
+          border: 3px solid rgba(255, 255, 255, 0.07);
+          border-top-color: var(--color-danger);
+          border-radius: 50%;
+          animation: spin 0.7s linear infinite;
+        }
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 1100px) {
+          .pengeluaran-grid {
+            grid-template-columns: 300px minmax(0, 1fr);
+          }
+        }
+        @media (max-width: 900px) {
+          .pengeluaran-grid {
+            grid-template-columns: 1fr;
+          }
+        }
+        @media (max-width: 640px) {
+          .pengeluaran-page {
+            padding: 1.25rem 0 4rem;
+          }
+          .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+          .summary-card {
+            width: 100%;
+          }
+          .form-panel,
+          .table-panel {
+            padding: 18px 16px;
+          }
+        }
+      `}</style>
+    </div>
+  );
+}
