@@ -87,10 +87,6 @@ export function useAbsensi() {
         video: { facingMode: 'user', width: 640, height: 480 }
       })
       streamRef.current = stream
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        await videoRef.current.play()
-      }
       setKameraAktif(true)
       setFotoBlob(null)
       setFotoPreview(null)
@@ -99,10 +95,24 @@ export function useAbsensi() {
     }
   }, [])
 
+  // Pasang stream ke elemen video ketika sudah tersedia
+  useEffect(() => {
+    if (!kameraAktif || !videoRef.current || !streamRef.current) return
+
+    videoRef.current.srcObject = streamRef.current
+    void videoRef.current.play().catch((err) => {
+      console.error('Video play failed', err)
+      setError('Tidak dapat memulai kamera. Silakan coba lagi.')
+    })
+  }, [kameraAktif])
+
   // Tutup kamera
   const tutupKamera = useCallback(() => {
     streamRef.current?.getTracks().forEach(t => t.stop())
     streamRef.current = null
+    if (videoRef.current) {
+      videoRef.current.srcObject = null
+    }
     setKameraAktif(false)
   }, [])
 
