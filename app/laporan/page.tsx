@@ -130,12 +130,12 @@ export default function LaporanPage() {
   );
 
   const totalPemasukanRentang = useMemo(
-    () => metodeList.reduce((sum, item) => sum + item[1], 0),
+    () => metodeList.reduce((sum: number, item: [string, number]) => sum + item[1], 0),
     [metodeList]
   );
 
   const totalPengeluaranRentang = useMemo(
-    () => kategoriList.reduce((sum, item) => sum + item[1], 0),
+    () => kategoriList.reduce((sum: number, item: [string, number]) => sum + item[1], 0),
     [kategoriList]
   );
 
