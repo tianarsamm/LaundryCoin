@@ -1,5 +1,6 @@
-'use client'
+ 'use client'
 
+import Image from 'next/image'
 import { useEffect } from 'react'
 import { useAbsensi } from '@/lib/supabase/hooks/useAbsensi'
 
@@ -30,12 +31,6 @@ export default function AbsensiPage() {
     cekLokasi, bukaKamera, ambilFoto, resetFoto, submit,
   } = useAbsensi()
 
-  useEffect(() => {
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-      registerPush()
-    }
-  }, [])
-
   async function registerPush() {
     try {
       const reg = await navigator.serviceWorker.ready
@@ -57,6 +52,12 @@ export default function AbsensiPage() {
       console.error('Push registration error:', e)
     }
   }
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator && 'PushManager' in window) {
+      void registerPush()
+    }
+  }, [])
 
   const sudahCheckin = !!todayLog.checkin
   const sudahCheckout = !!todayLog.checkout
@@ -244,10 +245,10 @@ export default function AbsensiPage() {
               </div>
             )}
 
-            {fotoPreview && (
+                {fotoPreview && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                 <div style={{ borderRadius: 14, overflow: 'hidden', aspectRatio: '4/3' }}>
-                  <img src={fotoPreview} alt="Preview" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+                  <Image src={fotoPreview} alt="Preview" width={800} height={600} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
                 </div>
                 <button className="abs-btn-dark" onClick={resetFoto}>Ulangi Foto</button>
               </div>

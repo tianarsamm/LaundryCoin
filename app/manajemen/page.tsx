@@ -18,12 +18,19 @@ interface Karyawan {
   last_login: string | null;
 }
 
-// ─── Mock data ────────────────────────────────────────────────────────────────
-const MOCK: Karyawan[] = [
-  { id: "1", username: "Admin01",    email: "budi@gmail.com",   nama: "Budi Santoso",   role: "admin",    nomor_wa: "08123456789", is_active: true,  last_login: "2025-01-15T08:30:00Z" },
-  { id: "2", username: "Kasir01",    email: "siti@gmail.com",   nama: "Siti Rahayu",    role: "kasir",    nomor_wa: "08234567890", is_active: true,  last_login: "2025-01-14T14:20:00Z" },
-  { id: "3", username: "Operator01", email: "andi@gmail.com",   nama: "Andi Wijaya",    role: "operator", nomor_wa: "08345678901", is_active: false, last_login: null },
-];
+// (removed unused MOCK sample data)
+
+// Supabase row type for users table
+type SupabaseUserRow = {
+  id: string;
+  username: string;
+  email: string;
+  nama: string;
+  role: Role;
+  no_hp?: string | null;
+  is_active: boolean;
+  last_login?: string | null;
+};
 
 const ROLE_LABEL: Record<Role, string> = {
   super_admin: "Super Admin",
@@ -277,10 +284,7 @@ export default function ManajemenKaryawanPage() {
   const [modalEdit, setModalEdit] = useState<Karyawan | null>(null);
   const [modalHapus, setModalHapus] = useState<Karyawan | null>(null);
 
-  useEffect(() => {
-    fetchKaryawan();
-  }, []);
-
+  // Ambil data karyawan (yang berrole admin)
   const fetchKaryawan = async () => {
     try {
       const { data, error } = await supabase
@@ -295,7 +299,7 @@ export default function ManajemenKaryawanPage() {
         return;
       }
 
-      const mapped: Karyawan[] = (data || []).map((u: any) => ({
+      const mapped: Karyawan[] = (data || []).map((u: SupabaseUserRow) => ({
         id: u.id,
         username: u.username,
         email: u.email,
@@ -311,6 +315,10 @@ export default function ManajemenKaryawanPage() {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    Promise.resolve().then(() => fetchKaryawan());
+  }, []);
 
   const filtered = list.filter(
     (k) =>

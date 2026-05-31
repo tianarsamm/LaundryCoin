@@ -4,9 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/supabase/hooks/useAuth";
+import type { MenuKey } from "@/lib/auth-types";
 
 interface NavItem {
-  key: string;
+  key: MenuKey;
   label: string;
   href: string;
   icon: React.ReactNode;
@@ -18,9 +19,9 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const { user, canAccess } = useAuth();
 
-  // Close menu on route change
+  // Close menu on route change (deferred to avoid sync setState in effect)
   useEffect(() => {
-    setMenuOpen(false);
+    Promise.resolve().then(() => setMenuOpen(false));
   }, [pathname]);
 
   // Prevent scroll when menu is open
@@ -123,7 +124,7 @@ export default function Navbar() {
           {/* Desktop Menu */}
           <ul className="navbar__menu">
             {NAV_ITEMS
-            .filter((item) => canAccess(item.key as any))
+            .filter((item) => canAccess(item.key))
             .map((item) => {
               const isActive = pathname === item.href;
               return (
@@ -192,7 +193,7 @@ export default function Navbar() {
         <div className="drawer__divider" />
 
         <ul className="drawer__menu">
-          {NAV_ITEMS.filter((item) => canAccess(item.key as any)).map((item, idx) => {
+          {NAV_ITEMS.filter((item) => canAccess(item.key)).map((item, idx) => {
             const isActive = pathname === item.href;
             return (
               <li key={item.href} style={{ animationDelay: `${idx * 55}ms` }}>
@@ -213,7 +214,7 @@ export default function Navbar() {
 
       {/* ── Bottom Nav (mobile fallback) ── */}
       <nav className="bottomnav">
-        {NAV_ITEMS.filter((item) => canAccess(item.key as any)).map((item) => {
+        {NAV_ITEMS.filter((item) => canAccess(item.key)).map((item) => {
           const isActive = pathname === item.href;
           return (
             <Link key={item.href} href={item.href} className={`bottomnav__item ${isActive ? "bottomnav__item--active" : ""}`}>

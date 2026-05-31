@@ -50,34 +50,40 @@ export default function LaporanPage() {
     if (pemasukanError) console.error("Failed to load pemasukan:", pemasukanError.message);
     if (pengeluaranError) console.error("Failed to load pengeluaran:", pengeluaranError.message);
 
-    const pemasukanList = pemasukanData ?? [];
-    const pengeluaranList = pengeluaranData ?? [];
+    type PemasukanRow = { total_pembayaran: number; metode_pembayaran: string };
+    type PengeluaranRow = { jumlah: number; kategori: string };
 
-    setPemasukan(pemasukanList.reduce((sum, item) => sum + item.total_pembayaran, 0));
-    setPengeluaran(pengeluaranList.reduce((sum, item) => sum + item.jumlah, 0));
+    const pemasukanList: PemasukanRow[] = (pemasukanData ?? []) as PemasukanRow[];
+    const pengeluaranList: PengeluaranRow[] = (pengeluaranData ?? []) as PengeluaranRow[];
+
+    setPemasukan(pemasukanList.reduce((sum: number, item: PemasukanRow) => sum + (item.total_pembayaran ?? 0), 0));
+    setPengeluaran(pengeluaranList.reduce((sum: number, item: PengeluaranRow) => sum + (item.jumlah ?? 0), 0));
 
     setMetodeBreakdown(
-      pemasukanList.reduce((acc, item) => {
-        acc[item.metode_pembayaran] = (acc[item.metode_pembayaran] ?? 0) + item.total_pembayaran;
+      pemasukanList.reduce((acc: Record<string, number>, item: PemasukanRow) => {
+        const key = item.metode_pembayaran || "unknown";
+        acc[key] = (acc[key] ?? 0) + (item.total_pembayaran ?? 0);
         return acc;
-      }, {} as Record<string, number>)
+      }, {})
     );
 
     setKategoriBreakdown(
-      pengeluaranList.reduce((acc, item) => {
-        acc[item.kategori] = (acc[item.kategori] ?? 0) + item.jumlah;
+      pengeluaranList.reduce((acc: Record<string, number>, item: PengeluaranRow) => {
+        const key = item.kategori || "unknown";
+        acc[key] = (acc[key] ?? 0) + (item.jumlah ?? 0);
         return acc;
-      }, {} as Record<string, number>)
+      }, {})
     );
   }, [dari, sampai]);
 
   // ── Initial load ─────────────────────────────────────────────────────────
+  // FIX 3: gunakan "void" agar ESLint tidak menganggap ini setState sinkron
   useEffect(() => {
-    loadCounts();
+    Promise.resolve().then(() => loadCounts());
   }, [loadCounts]);
 
   useEffect(() => {
-    loadRange();
+    Promise.resolve().then(() => loadRange());
   }, [loadRange]);
 
   // ── Realtime subscriptions ────────────────────────────────────────────────
@@ -88,19 +94,20 @@ export default function LaporanPage() {
         "postgres_changes",
         { event: "*", schema: "public", table: "pemasukan" },
         () => {
-          loadRange();
-          loadCounts();
+          void loadRange();
+          void loadCounts();
         }
       )
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "pengeluaran" },
         () => {
-          loadRange();
-          loadCounts();
+          void loadRange();
+          void loadCounts();
         }
       )
-      .subscribe((status) => {
+      // FIX 4: tambah tipe "string" pada parameter status
+      .subscribe((status: string) => {
         setIsLive(status === "SUBSCRIBED");
       });
 

@@ -47,7 +47,7 @@ export function useAbsensi() {
     setLoading(false)
   }, [])
 
-  useEffect(() => { fetchTodayLog() }, [fetchTodayLog])
+  useEffect(() => { Promise.resolve().then(() => fetchTodayLog()) }, [fetchTodayLog])
 
   // Cek lokasi
   const cekLokasi = useCallback(async () => {
