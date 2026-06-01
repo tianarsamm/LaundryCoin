@@ -1,12 +1,23 @@
 import { createSupabaseServerClient } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
+// Fungsi untuk mendapatkan tanggal hari ini dalam timezone Asia/Makassar
+function getTodayDateLocal(): string {
+  const formatter = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Makassar',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  })
+  return formatter.format(new Date())
+}
+
 export async function GET() {
   const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getTodayDateLocal()
 
   const { data, error } = await supabase
     .from('attendance_logs')
@@ -39,7 +50,7 @@ export async function POST(req: NextRequest) {
 
   if (!store) return NextResponse.json({ error: 'Store config tidak ditemukan' }, { status: 400 })
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = getTodayDateLocal()
   const { data: existing } = await supabase
     .from('attendance_logs')
     .select('type')
@@ -57,12 +68,26 @@ export async function POST(req: NextRequest) {
   if (type === 'checkout' && hasCheckout)
     return NextResponse.json({ error: 'Sudah check out hari ini' }, { status: 400 })
 
+  // Ambil shift assignment user untuk hari ini
+  const { data: shiftAssignment } = await supabase
+    .from('shift_assignments')
+    .select('shift_id, shifts(id, name, start_time, tolerance_minutes)')
+    .eq('user_id', user.id)
+    .eq('shift_date', today)
+    .single()
+
+  if (!shiftAssignment) {
+    return NextResponse.json({ error: 'Jadwal shift tidak ditemukan untuk hari ini' }, { status: 400 })
+  }
+
+  const shift = (shiftAssignment.shifts as any)
   let status: 'ontime' | 'late' = 'ontime'
+  
   if (type === 'checkin') {
     const now = new Date()
-    const [h, m] = store.jam_masuk.split(':').map(Number)
+    const [h, m] = shift.start_time.split(':').map(Number)
     const batasJam = new Date()
-    batasJam.setHours(h, m + store.toleransi_menit, 0, 0)
+    batasJam.setHours(h, m + shift.tolerance_minutes, 0, 0)
     if (now > batasJam) status = 'late'
   }
 
