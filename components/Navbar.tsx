@@ -17,7 +17,7 @@ export default function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { user, canAccess } = useAuth();
+  const { user, canAccess, signOut } = useAuth();
 
   useEffect(() => {
     Promise.resolve().then(() => setMenuOpen(false));
@@ -161,16 +161,30 @@ export default function Navbar() {
           </ul>
 
           {user && (
-            <div className="navbar__profile">
-              <div className="navbar__profile-avatar">
-                {(user.username ?? user.nama).charAt(0).toUpperCase()}
+            <div className="navbar__right-section">
+              <div className="navbar__profile">
+                <div className="navbar__profile-avatar">
+                  {(user.username ?? user.nama).charAt(0).toUpperCase()}
+                </div>
+                <div className="navbar__profile-text">
+                  <span className="navbar__profile-username">{user.username ?? user.nama}</span>
+                  <span className="navbar__profile-role">
+                    {user.role === "super_admin" ? "Super Admin" : "Admin"}
+                  </span>
+                </div>
               </div>
-              <div className="navbar__profile-text">
-                <span className="navbar__profile-username">{user.username ?? user.nama}</span>
-                <span className="navbar__profile-role">
-                  {user.role === "super_admin" ? "Super Admin" : "Admin"}
-                </span>
-              </div>
+              <button 
+                className="navbar__logout-btn"
+                onClick={signOut}
+                aria-label="Logout"
+                title="Logout"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                  <polyline points="16 17 21 12 16 7" />
+                  <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+              </button>
             </div>
           )}
 
@@ -232,6 +246,18 @@ export default function Navbar() {
         </ul>
 
         <div className="drawer__footer">
+          <button 
+            className="drawer__logout-btn"
+            onClick={signOut}
+            aria-label="Logout"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            <span>Logout</span>
+          </button>
           <p className="drawer__footer-text">Laundry Coin Premium © {new Date().getFullYear()}</p>
         </div>
       </aside>
@@ -340,11 +366,16 @@ export default function Navbar() {
         }
 
         /* Profile */
+        .navbar__right-section {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-left: 1rem;
+        }
         .navbar__profile {
           display: flex;
           align-items: center;
           gap: 0.9rem;
-          margin-left: 1rem;
           white-space: nowrap;
         }
         .navbar__profile-avatar {
@@ -365,6 +396,25 @@ export default function Navbar() {
           font-size: 0.72rem; font-weight: 700;
           color: var(--color-text-muted);
           text-transform: uppercase; letter-spacing: 0.4px;
+        }
+        .navbar__logout-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px; height: 40px;
+          border-radius: 10px;
+          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          color: var(--color-text-muted);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          padding: 0;
+          flex-shrink: 0;
+        }
+        .navbar__logout-btn:hover {
+          background: rgba(244, 63, 94, 0.1);
+          border-color: rgba(244, 63, 94, 0.2);
+          color: #ff6b6b;
         }
 
         /* Burger */
@@ -502,6 +552,29 @@ export default function Navbar() {
         .drawer__footer {
           padding: 1.5rem 1.25rem;
           border-top: 1px solid rgba(255, 255, 255, 0.04);
+          display: flex;
+          flex-direction: column;
+          gap: 1rem;
+        }
+        .drawer__logout-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 12px 16px;
+          border-radius: 14px;
+          font-size: 0.95rem;
+          font-weight: 600;
+          color: #ff6b6b;
+          background: rgba(244, 63, 94, 0.08);
+          border: 1px solid rgba(244, 63, 94, 0.2);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .drawer__logout-btn:hover {
+          background: rgba(244, 63, 94, 0.15);
+          border-color: rgba(244, 63, 94, 0.4);
+          color: #ff5555;
         }
         .drawer__footer-text {
           margin: 0; font-size: 0.8rem;
@@ -514,7 +587,7 @@ export default function Navbar() {
         ═══════════════════════════════ */
         @media (max-width: 820px) {
           .navbar__menu { display: none; }
-          .navbar__profile { display: none; }
+          .navbar__right-section { display: none; }
           .burger { display: flex; }
         }
       `}</style>
