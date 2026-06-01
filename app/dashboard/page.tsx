@@ -5,7 +5,7 @@ import StatCard from "@/components/Statcard";
 import TransaksiChart from "@/components/TransaksiChart";
 import { supabase } from "@/lib/supabaseClient";
 
-/* ── Types (inline, sesuai schema DB) ── */
+/* ── Types ── */
 type MetodePembayaran = "Cash" | "QRIS" | "Transfer Bank (BCA)";
 
 interface Pemasukan {
@@ -53,7 +53,7 @@ const METODE_OPTIONS: Array<MetodePembayaran | "Semua"> = [
   "Transfer Bank (BCA)",
 ];
 
-/* ── Premium SVG Icons ── */
+/* ── Icons ── */
 const IconRevenue = () => (
   <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" fill="currentColor" fillOpacity="0.12"/>
@@ -99,12 +99,10 @@ const IconEmpty = () => (
     <path d="M8 18l.7 1.5 1.5.7-1.5.7L8 23l-.7-1.6L5.8 21l1.5-.7z" fill="#06b6d4" fillOpacity="0.5"/>
     <defs>
       <linearGradient id="emptyGrad" x1="10" y1="26" x2="54" y2="56" gradientUnits="userSpaceOnUse">
-        <stop stopColor="#6366f1"/>
-        <stop offset="1" stopColor="#06b6d4"/>
+        <stop stopColor="#6366f1"/><stop offset="1" stopColor="#06b6d4"/>
       </linearGradient>
       <linearGradient id="emptyStroke" x1="10" y1="26" x2="54" y2="56" gradientUnits="userSpaceOnUse">
-        <stop stopColor="#6366f1"/>
-        <stop offset="1" stopColor="#06b6d4"/>
+        <stop stopColor="#6366f1"/><stop offset="1" stopColor="#06b6d4"/>
       </linearGradient>
     </defs>
   </svg>
@@ -119,77 +117,53 @@ export default function DashboardPage() {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-
       const [{ data: pemasukanData, error: pemasukanError }, { data: pengeluaranData, error: pengeluaranError }] =
         await Promise.all([
           supabase.from("pemasukan").select("*"),
           supabase.from("pengeluaran").select("*"),
         ]);
-
       if (pemasukanError) console.error("Failed to load pemasukan:", pemasukanError.message);
       if (pengeluaranError) console.error("Failed to load pengeluaran:", pengeluaranError.message);
-
       setPemasukan((pemasukanData as Pemasukan[]) ?? []);
       setPengeluaran((pengeluaranData as Pengeluaran[]) ?? []);
       setLoading(false);
     };
-
     loadData();
   }, []);
 
   const today = tanggalHariIni();
 
-  /* ── Filter data hari ini ── */
   const pemasukanHariIni = pemasukan.filter((item) => item.tanggal === today);
   const pengeluaranHariIni = pengeluaran.filter((item) => item.tanggal === today);
 
-  /* ── Filter berdasarkan metode pembayaran ── */
   const pemasukanFiltered =
     metodeFilter === "Semua"
       ? pemasukanHariIni
       : pemasukanHariIni.filter((item) => item.metode_pembayaran === metodeFilter);
 
-  /* ── Kalkulasi stats ── */
-  // Pemasukan: pakai filtered (ikut filter metode)
   const totalPemasukanHariIni = pemasukanFiltered.reduce(
-    (sum, item) => sum + Number(item.total_pembayaran),
-    0
+    (sum, item) => sum + Number(item.total_pembayaran), 0
   );
-
-  // Pengeluaran & laba: selalu pakai semua data hari ini (tidak ikut filter metode)
   const totalPengeluaranHariIni = pengeluaranHariIni.reduce(
-    (sum, item) => sum + Number(item.jumlah),
-    0
+    (sum, item) => sum + Number(item.jumlah), 0
   );
-
-  // Laba bersih: total pemasukan semua metode - pengeluaran
   const totalPemasukanSemua = pemasukanHariIni.reduce(
-    (sum, item) => sum + Number(item.total_pembayaran),
-    0
+    (sum, item) => sum + Number(item.total_pembayaran), 0
   );
   const labaHariIni = totalPemasukanSemua - totalPengeluaranHariIni;
 
-  /* ── Data grafik 7 hari terakhir ── */
   const grafikData = useMemo<RingkasanHarian[]>(() => {
     return Array.from({ length: 7 }, (_, i) => {
       const d = new Date();
       d.setDate(d.getDate() - (6 - i));
       const tanggal = d.toISOString().split("T")[0];
-
       const totalPemasukan = pemasukan
         .filter((item) => item.tanggal === tanggal)
         .reduce((sum, item) => sum + Number(item.total_pembayaran), 0);
-
       const totalPengeluaran = pengeluaran
         .filter((item) => item.tanggal === tanggal)
         .reduce((sum, item) => sum + Number(item.jumlah), 0);
-
-      return {
-        tanggal,
-        totalPemasukan,
-        totalPengeluaran,
-        laba: totalPemasukan - totalPengeluaran,
-      };
+      return { tanggal, totalPemasukan, totalPengeluaran, laba: totalPemasukan - totalPengeluaran };
     });
   }, [pemasukan, pengeluaran]);
 
@@ -200,29 +174,24 @@ export default function DashboardPage() {
   const chartPemasukan = grafikData.map((item) => item.totalPemasukan);
   const chartPengeluaran = grafikData.map((item) => item.totalPengeluaran);
 
-  /* ── 5 transaksi terbaru hari ini ── */
   const recentTransaksi = [...pemasukanHariIni]
     .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
     .slice(0, 5);
 
   return (
     <div className="dashboard-page">
-      {/* Decorative background glows */}
       <div className="dashboard-bg-glow glow-1" />
       <div className="dashboard-bg-glow glow-2" />
 
       <div className="dashboard-container container">
-        {/* ── Header ── */}
+        {/* Header */}
         <section className="dashboard-header">
           <div>
             <p className="dashboard-eyebrow">RINGKASAN HARI INI</p>
             <h1 className="dashboard-title">Overview Laundry</h1>
             <p className="dashboard-subtitle">
               {new Date().toLocaleDateString("id-ID", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
+                weekday: "long", year: "numeric", month: "long", day: "numeric",
               })}
             </p>
           </div>
@@ -240,7 +209,7 @@ export default function DashboardPage() {
           </div>
         </section>
 
-        {/* ── Loading skeleton ── */}
+        {/* Loading skeleton */}
         {loading ? (
           <div className="skeleton-grid">
             {[1, 2, 3].map((i) => (
@@ -249,7 +218,7 @@ export default function DashboardPage() {
           </div>
         ) : (
           <>
-            {/* ── Stats ── */}
+            {/* Stats */}
             <section className="stat-grid">
               <StatCard
                 label="Pemasukan Hari Ini"
@@ -274,19 +243,22 @@ export default function DashboardPage() {
               />
             </section>
 
-            {/* ── Chart + Recent ── */}
+            {/* Chart + Recent */}
             <div className="dashboard-main-grid">
               <section className="chart-card glass-panel">
                 <div className="card-header">
                   <div className="card-header__dot" />
                   <h2>Grafik Transaksi 7 Hari Terakhir</h2>
                 </div>
-                <div className="chart-card__body">
-                  <TransaksiChart
-                    labels={chartLabels}
-                    pemasukan={chartPemasukan}
-                    pengeluaran={chartPengeluaran}
-                  />
+                {/* ✅ FIX: wrapper dengan overflow hidden + padding bawah cukup */}
+                <div className="chart-card__wrapper">
+                  <div className="chart-card__body">
+                    <TransaksiChart
+                      labels={chartLabels}
+                      pemasukan={chartPemasukan}
+                      pengeluaran={chartPengeluaran}
+                    />
+                  </div>
                 </div>
               </section>
 
@@ -298,9 +270,7 @@ export default function DashboardPage() {
 
                 {recentTransaksi.length === 0 ? (
                   <div className="empty-state">
-                    <div className="empty-icon-wrap">
-                      <IconEmpty />
-                    </div>
+                    <div className="empty-icon-wrap"><IconEmpty /></div>
                     <p className="empty-title">Belum ada transaksi</p>
                     <p className="empty-sub">Transaksi hari ini akan muncul di sini</p>
                   </div>
@@ -312,11 +282,8 @@ export default function DashboardPage() {
                         className="recent-item"
                         style={{ animationDelay: `${idx * 60}ms` }}
                       >
-                        <div className="recent-item__icon">
-                          <IconTransaction />
-                        </div>
+                        <div className="recent-item__icon"><IconTransaction /></div>
                         <div className="recent-item__info">
-                          {/* ✅ Pakai snake_case sesuai DB */}
                           <p className="recent-name">{item.layanan_utama}</p>
                           <p className="recent-meta">{item.metode_pembayaran}</p>
                         </div>
@@ -364,7 +331,7 @@ export default function DashboardPage() {
           animation-delay: 2s;
         }
         @keyframes pulse {
-          0%   { transform: translateY(0) scale(1);   opacity: 0.18; }
+          0%   { transform: translateY(0) scale(1);      opacity: 0.18; }
           100% { transform: translateY(20px) scale(1.1); opacity: 0.28; }
         }
 
@@ -477,6 +444,12 @@ export default function DashboardPage() {
         .recent-card {
           padding: 24px;
         }
+
+        /* ✅ FIX: chart card dapat padding bawah ekstra agar axis label tidak keluar */
+        .chart-card {
+          padding-bottom: 32px;
+        }
+
         .card-header {
           display: flex;
           align-items: center;
@@ -498,9 +471,18 @@ export default function DashboardPage() {
           box-shadow: 0 0 10px var(--color-primary);
           flex-shrink: 0;
         }
+
+        /* ✅ FIX: wrapper mencegah chart overflow keluar card */
+        .chart-card__wrapper {
+          position: relative;
+          width: 100%;
+          overflow: hidden;
+        }
+
+        /* ✅ FIX: height lebih besar dari sebelumnya agar axis tidak terpotong */
         .chart-card__body {
           position: relative;
-          height: 300px;
+          height: 320px;
           width: 100%;
         }
 
@@ -539,10 +521,7 @@ export default function DashboardPage() {
           flex-shrink: 0;
           color: var(--color-primary-dim);
         }
-        .recent-item__info {
-          flex: 1;
-          min-width: 0;
-        }
+        .recent-item__info { flex: 1; min-width: 0; }
         .recent-name {
           margin: 0 0 2px;
           font-weight: 700;
@@ -590,208 +569,122 @@ export default function DashboardPage() {
           0%,100% { transform: translateY(0); }
           50%      { transform: translateY(-7px); }
         }
-        .empty-title {
-          font-weight: 700;
-          font-size: 0.95rem;
-          color: var(--color-text);
-          margin: 0;
-        }
-        .empty-sub {
-          font-size: 0.8rem;
-          color: var(--color-text-muted);
-          margin: 0;
-        }
+        .empty-title { font-weight: 700; font-size: 0.95rem; color: var(--color-text); margin: 0; }
+        .empty-sub   { font-size: 0.8rem; color: var(--color-text-muted); margin: 0; }
 
         /* ── Responsive ── */
-        @media (max-width: 1200px) {
-          .stat-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-          }
-        }
         @media (max-width: 1100px) {
-          .dashboard-main-grid {
-            grid-template-columns: 3fr 2fr;
-          }
+          .dashboard-main-grid { grid-template-columns: 3fr 2fr; }
         }
         @media (max-width: 900px) {
-          .dashboard-main-grid {
-            grid-template-columns: 1fr;
+          .dashboard-main-grid { grid-template-columns: 1fr; }
+        }
+
+        /* Stat grid: turun ke 2-col lebih awal agar angka rupiah tidak terpotong */
+        @media (max-width: 720px) {
+          .stat-grid,
+          .skeleton-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
-          .stat-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+          .stat-grid > *:last-child,
+          .skeleton-grid > *:last-child {
+            grid-column: 1 / -1;
           }
         }
+
         @media (max-width: 768px) {
-          .dashboard-page {
-            padding: 1.5rem 0 4rem;
-          }
-          .dashboard-container {
-            gap: 1.25rem;
-          }
+          .dashboard-page { padding: 1.5rem 0 4rem; }
+          .dashboard-container { gap: 1.25rem; }
           .dashboard-header {
             flex-direction: column;
             align-items: flex-start;
             gap: 0.75rem;
           }
-          .dashboard-title {
-            font-size: clamp(1.5rem, 2.5vw, 2rem);
-          }
-          .filter-group {
-            width: 100%;
-            border-radius: 12px;
-          }
-          .filter-button {
-            flex: 1;
-            min-width: 70px;
-            padding: 0.5rem 0.4rem;
-            font-size: 0.76rem;
-          }
-          .stat-grid {
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-          }
-          .chart-card,
-          .recent-card {
-            padding: 18px 16px;
-          }
-          .chart-card__body {
-            height: 240px;
-          }
-          .card-header h2 {
-            font-size: 1rem;
-          }
+          .dashboard-title { font-size: clamp(1.5rem, 2.5vw, 2rem); }
+          .filter-group { width: 100%; border-radius: 12px; }
+          .filter-button { flex: 1; min-width: 60px; padding: 0.5rem 0.4rem; font-size: 0.76rem; }
+          .chart-card, .recent-card { padding: 18px 16px; }
+
+          /* ✅ FIX: padding bawah ekstra di tablet */
+          .chart-card { padding-bottom: 36px; }
+
+          /* ✅ FIX: height lebih tinggi agar axis label tidak terpotong */
+          .chart-card__body { height: 280px; }
+          .card-header h2 { font-size: 1rem; }
         }
+
         @media (max-width: 640px) {
-          .dashboard-page {
-            padding: 1rem 0 4rem;
-          }
+          .dashboard-page { padding: 1rem 0 4rem; }
           .dashboard-header {
             flex-direction: column;
             align-items: flex-start;
             gap: 0.5rem;
           }
-          .dashboard-title {
-            font-size: clamp(1.3rem, 2vw, 1.8rem);
-            letter-spacing: -0.6px;
-          }
-          .dashboard-subtitle {
-            font-size: 0.8rem;
-          }
-          .dashboard-eyebrow {
-            font-size: 0.65rem;
-            margin-bottom: 0.2rem;
-          }
+          .dashboard-title   { font-size: clamp(1.3rem, 2vw, 1.8rem); letter-spacing: -0.6px; }
+          .dashboard-subtitle { font-size: 0.8rem; }
+          .dashboard-eyebrow  { font-size: 0.65rem; margin-bottom: 0.2rem; }
           .stat-grid,
           .skeleton-grid {
             grid-template-columns: 1fr;
             gap: 0.875rem;
           }
-          .stat-card {
-            padding: 1rem 1.2rem;
+          .stat-grid > *:last-child,
+          .skeleton-grid > *:last-child {
+            grid-column: auto;
           }
-          .filter-group {
-            width: 100%;
-            padding: 3px;
-            border-radius: 10px;
-          }
-          .filter-button {
-            padding: 0.5rem 0.3rem;
-            font-size: 0.7rem;
-          }
-          .chart-card,
-          .recent-card {
-            padding: 14px;
-          }
-          .chart-card__body {
-            height: 200px;
-          }
-          .card-header {
-            margin-bottom: 16px;
-            gap: 8px;
-          }
-          .card-header h2 {
-            font-size: 0.9rem;
-          }
-          .recent-list {
-            gap: 6px;
-          }
-          .recent-item {
-            padding: 10px 12px;
-            gap: 10px;
-          }
-          .recent-item__icon {
-            width: 32px; height: 32px;
-          }
-          .recent-name {
-            font-size: 0.8rem;
-          }
-          .recent-meta {
-            font-size: 0.7rem;
-          }
-          .recent-value {
-            font-size: 0.8rem;
-          }
-          .empty-state {
-            padding: 2rem 1rem;
-          }
-          .empty-icon-wrap {
-            width: 60px; height: 60px;
-          }
-          .empty-title {
-            font-size: 0.9rem;
-          }
-          .empty-sub {
-            font-size: 0.75rem;
-          }
-          .glow-1,
-          .glow-2 {
-            filter: blur(80px);
-            opacity: 0.12;
-          }
+          .filter-group { width: 100%; padding: 3px; border-radius: 10px; }
+          .filter-button { padding: 0.5rem 0.3rem; font-size: 0.7rem; }
+          .chart-card, .recent-card { padding: 14px; }
+
+          /* ✅ FIX: cukup ruang untuk axis label di mobile */
+          .chart-card { padding-bottom: 40px; }
+
+          /* ✅ FIX: height naik dari 200px → 240px agar axis tidak terpotong */
+          .chart-card__body { height: 240px; }
+          .card-header { margin-bottom: 16px; gap: 8px; }
+          .card-header h2 { font-size: 0.9rem; }
+          .recent-list  { gap: 6px; }
+          .recent-item  { padding: 10px 12px; gap: 10px; }
+          .recent-item__icon { width: 32px; height: 32px; }
+          .recent-name  { font-size: 0.8rem; }
+          .recent-meta  { font-size: 0.7rem; }
+          .recent-value { font-size: 0.8rem; }
+          .empty-state  { padding: 2rem 1rem; }
+          .empty-icon-wrap { width: 60px; height: 60px; }
+          .empty-title  { font-size: 0.9rem; }
+          .empty-sub    { font-size: 0.75rem; }
+          .glow-1, .glow-2 { filter: blur(80px); opacity: 0.12; }
         }
+
         @media (max-width: 480px) {
-          .dashboard-page {
-            padding: 0.75rem 0 3.5rem;
+          .dashboard-page { padding: 0.75rem 0 3.5rem; }
+          .dashboard-container { gap: 1rem; }
+          .dashboard-title { font-size: 1.4rem; }
+          /* Filter: scroll horizontal agar tidak dipaksa wrapping */
+          .filter-group {
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            border-radius: 10px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
           }
-          .dashboard-container {
-            gap: 1rem;
-          }
-          .dashboard-title {
-            font-size: 1.4rem;
-          }
+          .filter-group::-webkit-scrollbar { display: none; }
           .filter-button {
+            flex-shrink: 0;
             font-size: 0.65rem;
-            padding: 0.45rem 0.2rem;
+            padding: 0.45rem 0.65rem;
           }
-          .stat-card {
-            padding: 0.9rem 1rem;
-          }
-          .stat-num {
-            font-size: 1.5rem;
-          }
-          .stat-label {
-            font-size: 0.7rem;
-          }
-          .chart-card,
-          .recent-card {
-            padding: 12px;
-          }
-          .chart-card__body {
-            height: 180px;
-          }
-          .card-header {
-            margin-bottom: 12px;
-          }
-          .card-header__dot {
-            width: 6px; height: 6px;
-          }
-          .recent-item {
-            padding: 8px 10px;
-          }
-          .recent-item__icon {
-            width: 28px; height: 28px;
-            font-size: 0.8rem;
-          }
+          .chart-card, .recent-card { padding: 12px; }
+
+          /* ✅ FIX: padding bawah extra di hp kecil */
+          .chart-card { padding-bottom: 44px; }
+
+          /* ✅ FIX: height naik dari 180px → 220px */
+          .chart-card__body { height: 220px; }
+          .card-header { margin-bottom: 12px; }
+          .card-header__dot { width: 6px; height: 6px; }
+          .recent-item { padding: 8px 10px; }
+          .recent-item__icon { width: 28px; height: 28px; }
         }
       `}</style>
     </div>
