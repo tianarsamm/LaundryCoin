@@ -345,6 +345,23 @@ export default function ManajemenKaryawanPage() {
     router.push(`/manajemen/gaji?id=${k.id}`);
   };
 
+  // ── NAVIGASI KE HALAMAN RIWAYAT ABSENSI ─────────────────────────
+  // Simpan data karyawan ke sessionStorage supaya halaman Riwayat bisa
+  // membacanya dan menampilkan riwayat untuk karyawan yang dipilih.
+  const handleLihatRiwayat = (k: Karyawan) => {
+    sessionStorage.setItem(
+      `karyawan_${k.id}`,
+      JSON.stringify({
+        id:       k.id,
+        nama:     k.nama,
+        role:     ROLE_LABEL[k.role],
+        nomor_wa: k.nomor_wa,
+        email:    k.email,
+      })
+    );
+    router.push(`/manajemen/riwayat?id=${k.id}`);
+  };
+
   const handleAdd = async (data: Partial<Karyawan> & { password?: string }) => {
     try {
       const res = await fetch("/api/karyawan", {
@@ -447,7 +464,7 @@ export default function ManajemenKaryawanPage() {
           <table>
             <thead>
               <tr>
-                <th>#</th>
+                <th>No</th>
                 <th>Karyawan</th>
                 <th>Role</th>
                 <th>Nomor WhatsApp</th>
@@ -494,7 +511,13 @@ export default function ManajemenKaryawanPage() {
                     </button>
                   </td>
                   <td className="td-center">
-                    <button className="action-btn action-cal" title="Riwayat Absensi"><IconCal /></button>
+                    <button
+                      className="action-btn action-cal"
+                      title="Riwayat Absensi"
+                      onClick={() => handleLihatRiwayat(k)}
+                    >
+                      <IconCal />
+                    </button>
                   </td>
                   <td className="td-center">
                     <div className="action-group">

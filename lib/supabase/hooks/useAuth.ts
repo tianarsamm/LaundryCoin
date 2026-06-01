@@ -7,10 +7,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import type { UserProfile, MenuKey } from "@/lib/auth-types";
-import {
-  ALWAYS_ENABLED_MENUS,
-  TOGGLEABLE_MENUS,
-} from "@/lib/auth-types";
+import { TOGGLEABLE_MENUS } from "@/lib/auth-types";
 
 
 
@@ -57,49 +54,52 @@ export function useAuth(): AuthState & {
     const userProfile = profile as UserProfile;
 
     // 3. Hitung allowed menus
-let allowedMenus: MenuKey[] = [];
+    let allowedMenus: MenuKey[] = [];
 
-if (userProfile.role === "super_admin") {
-  allowedMenus = [
-    "dashboard",
-    "pemasukan",
-    "pengeluaran",
-    "absensi",
-    "laporan",
-    "jadwal",
-    "manajemen_karyawan",
-    "kelola_absensi",
-  ];
+    if (userProfile.role === "super_admin") {
+      allowedMenus = [
+        "dashboard",
+        "pemasukan",
+        "pengeluaran",
+        "laporan",
+        "jadwal",
+        "manajemen_karyawan",
+        "manajemen_izin",
+        // "izin",
+        "kelola_absensi",
+      ];
 
-  // optional custom permissions super admin
-  const { data: perms } = await supabase
-    .from("menu_permissions")
-    .select("menu_key, is_enabled")
-    .eq("user_id", authUser.id)
-    .eq("is_enabled", true);
+      // optional custom permissions super admin
+      const { data: perms } = await supabase
+        .from("menu_permissions")
+        .select("menu_key, is_enabled")
+        .eq("user_id", authUser.id)
+        .eq("is_enabled", true);
 
-  if (perms) {
-    perms.forEach((p) => {
-      const key = p.menu_key as MenuKey;
+      if (perms) {
+        perms.forEach((p) => {
+          const key = p.menu_key as MenuKey;
 
-      if (
-        TOGGLEABLE_MENUS.includes(key) &&
-        !allowedMenus.includes(key)
-      ) {
-        allowedMenus.push(key);
+          if (
+            TOGGLEABLE_MENUS.includes(key) &&
+            !allowedMenus.includes(key)
+          ) {
+            allowedMenus.push(key);
+          }
+        });
       }
-    });
-  }
 
-} else {
+    } else {
 
-  // ADMIN HANYA BOLEH MENU INI
-  allowedMenus = [
-    "dashboard",
-    "pemasukan",
-    "pengeluaran",
-  ];
-}
+      // ADMIN: tambahkan akses absensi dan izin untuk role admin biasa
+      allowedMenus = [
+        "dashboard",
+        "pemasukan",
+        "pengeluaran",
+        "absensi",
+        "izin",
+      ];
+    }
 
     setState({ user: userProfile, loading: false, allowedMenus });
   }, []);

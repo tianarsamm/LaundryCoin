@@ -1,8 +1,8 @@
-import { createSupabaseServer } from '@/lib/supabase/server'
+import { createSupabaseServerClient } from '@/lib/auth'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET() {
-  const supabase = await createSupabaseServer()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -25,7 +25,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const supabase = await createSupabaseServer()
+  const supabase = await createSupabaseServerClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

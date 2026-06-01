@@ -56,6 +56,28 @@ export default function Navbar() {
       ),
     },
     {
+      key: "absensi",
+      label: "Absensi",
+      href: "/absensi",
+      icon: (
+        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {/* <circle cx="12" cy="12" r="9" />
+          <path d="M12 7v6l4 2" /> */}
+        </svg>
+      ),
+    },
+    {
+      key: "izin",
+      label: "Izin",
+      href: "/izin",
+      icon: (
+        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {/* <path d="M6 7h12M6 11h10M6 15h8" />
+          <path d="M4 5h16v14H4z" /> */}
+        </svg>
+      ),
+    },
+    {
       key: "pemasukan",
       label: "Pemasukan",
       href: "/pemasukan",
@@ -98,6 +120,17 @@ export default function Navbar() {
           {/* <line x1="18" y1="20" x2="18" y2="10" />
           <line x1="12" y1="20" x2="12" y2="4" />
           <line x1="6" y1="20" x2="6" y2="14" /> */}
+        </svg>
+      ),
+    },
+    {
+      key: "manajemen_izin",
+      label: "Manajemen Izin",
+      href: "/manajemen/izin",
+      icon: (
+        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {/* <path d="M4 7h16M8 11h8M10 15h4" />
+          <path d="M6 5h12a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" /> */}
         </svg>
       ),
     },

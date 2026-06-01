@@ -18,6 +18,7 @@ interface RiwayatGaji {
   tarif_lembur: number;
   potongan_telat: number;
   total_gaji: number;
+  user_id?: string;
   status: StatusGaji;
   tanggal_bayar: string | null;
   catatan: string;
@@ -102,6 +103,17 @@ const PERIODE_OPTIONS = Array.from({ length: 12 }, (_, i) => {
   return `${BULAN[d.getMonth()]} ${d.getFullYear()}`;
 });
 
+function periodeToMonthStart(periode: string) {
+  // periode expected like "Mei 2026"
+  const parts = periode.split(' ');
+  if (parts.length < 2) return new Date().toISOString().slice(0,10);
+  const bulanName = parts[0];
+  const tahun = Number(parts[1]) || new Date().getFullYear();
+  const m = BULAN.findIndex(b => b.toLowerCase() === bulanName.toLowerCase());
+  const mm = (m >= 0 ? m + 1 : new Date().getMonth() + 1).toString().padStart(2, '0');
+  return `${tahun}-${mm}-01`;
+}
+
 const STATUS_COLOR: Record<StatusGaji, string> = {
   "Sudah Dibayar": "status-paid",
   "Belum Dibayar": "status-unpaid",
@@ -122,16 +134,38 @@ const ISave    = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="non
 
 // ─── Modal Detail Slip ────────────────────────────────────────────────────────
 function ModalDetail({
-  r, nama, nomor_wa, onClose,
+  r, userId, nama, nomor_wa, onClose,
 }: {
   r: RiwayatGaji;
+  userId?: string | null;
   nama: string;
   nomor_wa: string;
   onClose: () => void;
 }) {
   const lembur_total    = r.lembur_jam * r.tarif_lembur;
   const potongan_total  = r.telat * r.potongan_telat;
-  const bersih          = r.gaji_pokok + lembur_total - potongan_total;
+  const [potonganIzin, setPotonganIzin] = useState<number>(0);
+  const bersih          = r.gaji_pokok + lembur_total - potongan_total - (potonganIzin || 0);
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const bulan = periodeToMonthStart(r.periode);
+        // user id will be passed when ModalDetail is rendered
+        const uid = userId || (r as any).user_id || null;
+        if (!uid) return;
+        const { data } = await supabase
+          .from('vw_potongan_izin')
+          .select('total_potongan')
+          .eq('user_id', uid)
+          .eq('bulan', bulan)
+          .single();
+        setPotonganIzin(data?.total_potongan ?? 0);
+      } catch (e) {
+        console.error('Failed fetch potongan izin', e);
+      }
+    })();
+  }, [r.periode, r]);
 
   const handleWA = () => {
     const msg = encodeURIComponent(
@@ -139,7 +173,8 @@ function ModalDetail({
       `Nama: ${nama}\n` +
       `Gaji Pokok: ${IDR(r.gaji_pokok)}\n` +
       `Lembur (${r.lembur_jam} jam × ${IDR(r.tarif_lembur)}): ${IDR(lembur_total)}\n` +
-      `Potongan Telat (${r.telat}× × ${IDR(r.potongan_telat)}): -${IDR(potongan_total)}\n` +
+        `Potongan Telat (${r.telat}× × ${IDR(r.potongan_telat) /* placeholder */}): -${IDR(potongan_total)}\n` +
+        (potonganIzin > 0 ? `Potongan Izin/Sakit: -${IDR(potonganIzin)}\n` : '') +
       `━━━━━━━━━━━━━━━\n` +
       `GAJI DITERIMA: ${IDR(bersih)}\n` +
       `Status: ${r.status}`
@@ -185,6 +220,12 @@ function ModalDetail({
             <div className="slip-row">
               <span>Potongan Telat<br/><small>{r.telat}× × {IDR(r.potongan_telat)}</small></span>
               <span className="slip-minus">− {IDR(potongan_total)}</span>
+            </div>
+          )}
+          {potonganIzin > 0 && (
+            <div className="slip-row">
+              <span>Potongan Izin / Sakit<br/><small>Potongan terhitung dari izin / sakit</small></span>
+              <span className="slip-minus">− {IDR(potonganIzin)}</span>
             </div>
           )}
         </div>
@@ -256,11 +297,12 @@ function ModalDetail({
 
 // ─── Modal Tambah Gaji ────────────────────────────────────────────────────────
 function ModalTambahGaji({
-  pengaturan, onClose, onSave,
+  pengaturan, onClose, onSave, userId,
 }: {
   pengaturan: PengaturanGaji;
   onClose: () => void;
   onSave: (r: Omit<RiwayatGaji, "id">) => void;
+  userId?: string | null;
 }) {
   const [periode, setPeriode]   = useState(PERIODE_OPTIONS[0]);
   const [hadir, setHadir]       = useState(26);
@@ -269,12 +311,32 @@ function ModalTambahGaji({
   const [status, setStatus]     = useState<StatusGaji>("Belum Dibayar");
   const [tglBayar, setTglBayar] = useState(new Date().toISOString().slice(0,10));
   const [catatan, setCatatan]   = useState("");
+  const [potonganIzinLocal, setPotonganIzinLocal] = useState<number>(0);
 
   const lembur_total   = lembur * pengaturan.tarif_lembur;
   const potongan_total = telat * pengaturan.potongan_per_telat;
-  const total_gaji     = pengaturan.gaji_pokok + lembur_total - potongan_total;
+  const total_gaji = pengaturan.gaji_pokok + lembur_total - potongan_total;
 
-  const handleSave = () => {
+  const handleSave = async () => {
+    let potIzin = 0;
+    try {
+      if (userId) {
+        const bulan = periodeToMonthStart(periode);
+        const { data } = await supabase
+          .from('vw_potongan_izin')
+          .select('total_potongan')
+          .eq('user_id', userId)
+          .eq('bulan', bulan)
+          .single();
+        potIzin = data?.total_potongan ?? 0;
+        setPotonganIzinLocal(potIzin);
+      }
+    } catch (e) {
+      console.error('Failed to fetch potongan izin', e);
+    }
+
+    const totalWithPotIzin = pengaturan.gaji_pokok + lembur * pengaturan.tarif_lembur - telat * pengaturan.potongan_per_telat - potIzin;
+
     onSave({
       periode,
       hadir,
@@ -283,7 +345,7 @@ function ModalTambahGaji({
       gaji_pokok: pengaturan.gaji_pokok,
       tarif_lembur: pengaturan.tarif_lembur,
       potongan_telat: pengaturan.potongan_per_telat,
-      total_gaji,
+      total_gaji: totalWithPotIzin,
       status,
       tanggal_bayar: status === "Sudah Dibayar" ? tglBayar : null,
       catatan,
@@ -465,7 +527,7 @@ function GajiPageInner() {
   };
 
   const handleSaveRiwayat = (r: Omit<RiwayatGaji, "id">) => {
-    const newR: RiwayatGaji = { ...r, id: `r${Date.now()}` };
+    const newR: RiwayatGaji = { ...r, id: `r${Date.now()}`, user_id: karyawan?.id };
     setRiwayat(prev => [newR, ...prev]);
     setModalTambah(false);
     setTab("riwayat");
@@ -736,6 +798,7 @@ function GajiPageInner() {
       {modalDetail && (
         <ModalDetail
           r={modalDetail}
+          userId={karyawan?.id}
           nama={karyawan.nama}
           nomor_wa={karyawan.nomor_wa}
           onClose={() => setModalDetail(null)}
@@ -744,6 +807,7 @@ function GajiPageInner() {
       {modalTambah && (
         <ModalTambahGaji
           pengaturan={pengaturan}
+          userId={karyawan?.id}
           onClose={() => setModalTambah(false)}
           onSave={handleSaveRiwayat}
         />

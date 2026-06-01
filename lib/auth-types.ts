@@ -6,6 +6,8 @@ export type MenuKey =
   | "pengeluaran"
   | "laporan"
   | "manajemen_karyawan"
+  | "manajemen_izin"
+  | "izin"
   | "jadwal"
   | "kelola_absensi"
   | "absensi";
@@ -33,7 +35,6 @@ export const ALWAYS_ENABLED_MENUS: MenuKey[] = [
   "dashboard",
   "pemasukan",
   "pengeluaran",
-  "absensi",
 ];
 
 /** Menu EKSKLUSIF super admin — tidak bisa di-toggle ke admin */

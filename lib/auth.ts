@@ -13,7 +13,6 @@ import type {
 } from "@/lib/auth-types";
 import {
   ALWAYS_ENABLED_MENUS,
-  SUPER_ADMIN_ONLY_MENUS,
   TOGGLEABLE_MENUS,
 } from "@/lib/auth-types";
 
@@ -161,11 +160,12 @@ export async function getAllowedMenus(userId?: string): Promise<MenuKey[]> {
       "laporan",
       "jadwal",
       "manajemen_karyawan",
+      "manajemen_izin",
       "kelola_absensi",
     ];
   }
 
-  const allowed: MenuKey[] = [...ALWAYS_ENABLED_MENUS];
+  const allowed: MenuKey[] = [...ALWAYS_ENABLED_MENUS, "izin"];
 
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
@@ -397,9 +397,10 @@ export async function createKaryawan(payload: {
 
     console.log("[createKaryawan] Karyawan berhasil dibuat:", updatedProfile.id);
     return { success: true, user: updatedProfile as UserProfile };
-  } catch (err: any) {
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err);
     console.error("[createKaryawan] Unexpected error:", err);
-    return { success: false, error: `Error: ${err?.message ?? String(err)}` };
+    return { success: false, error: `Error: ${message}` };
   }
 }
 
@@ -436,8 +437,9 @@ export async function setKaryawanActive(
 export async function updateKaryawanRole(
   targetUserId: string,
   newRole: UserRole,
-  requesterId: string
+  _requesterId: string
 ): Promise<{ success: boolean; error?: string }> {
+  void _requesterId;
   if (newRole === "admin") {
     const supabase = await createSupabaseServerClient();
     const { data } = await supabase
