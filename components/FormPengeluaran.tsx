@@ -6,7 +6,6 @@ import {
   LIST_KATEGORI_PENGELUARAN,
   formatRupiah,
   getTanggalHariIni,
-  generateId,
 } from "@/lib/constants";
 import type { KategoriPengeluaran } from "@/lib/supabase/types";
 
@@ -24,12 +23,7 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
     event.preventDefault();
     if (jumlah <= 0) return;
 
-    addPengeluaran({
-      tanggal,
-      kategori,
-      keterangan,
-      jumlah,
-    });
+    addPengeluaran({ tanggal, kategori, keterangan, jumlah });
 
     setTanggal(getTanggalHariIni());
     setKategori(LIST_KATEGORI_PENGELUARAN[0]);
@@ -101,6 +95,8 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
           display: flex;
           flex-direction: column;
           gap: 1.25rem;
+          min-width: 0;
+          width: 100%;
         }
 
         .form-pengeluaran h2 {
@@ -115,12 +111,15 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
         .form-grid {
           display: grid;
           gap: 1.25rem;
+          min-width: 0;
+          width: 100%;
         }
 
         .field {
           display: flex;
           flex-direction: column;
           gap: 6px;
+          min-width: 0;
         }
 
         .field span {
@@ -135,6 +134,7 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
         .field input,
         .field select {
           width: 100%;
+          box-sizing: border-box;
           background: rgba(255, 255, 255, 0.02);
           border: 1px solid rgba(255, 255, 255, 0.06);
           color: #ffffff;
@@ -143,6 +143,9 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
           outline: none;
           transition: all 0.25s ease;
           appearance: none;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .field select {
@@ -169,16 +172,21 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          gap: 8px;
           padding: 18px;
           border-radius: 12px;
           background: rgba(255, 255, 255, 0.01);
           border: 1px solid rgba(255, 255, 255, 0.05);
           font-size: 0.88rem;
+          min-width: 0;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .summary-box span {
           color: var(--color-text-muted);
           font-weight: 500;
+          flex-shrink: 0;
         }
 
         .summary-box strong {
@@ -187,19 +195,26 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
           font-weight: 800;
           color: var(--color-danger);
           text-shadow: 0 0 8px rgba(244, 63, 94, 0.2);
+          text-align: right;
+          word-break: break-all;
+          min-width: 0;
         }
 
         /* Submit Button */
         .submit-button {
           width: 100%;
+          box-sizing: border-box;
           border-radius: 12px;
-          padding: 14px;
+          padding: 14px 12px;
           background: linear-gradient(135deg, var(--color-danger), #f43f5e);
           color: #ffffff;
           font-size: 0.92rem;
           font-weight: 700;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           box-shadow: 0 4px 20px rgba(244, 63, 94, 0.3);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .submit-button:hover:not(:disabled) {
@@ -223,6 +238,50 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
         @media (max-width: 640px) {
           .form-grid {
             gap: 1rem;
+          }
+
+          .form-pengeluaran h2 {
+            font-size: 1.1rem;
+          }
+
+          .field input,
+          .field select {
+            padding: 10px 12px;
+            font-size: 0.9rem;
+          }
+
+          .field select {
+            padding-right: 36px;
+          }
+
+          .summary-box {
+            padding: 14px;
+          }
+
+          .summary-box strong {
+            font-size: 1rem;
+          }
+
+          .submit-button {
+            padding: 13px 10px;
+            font-size: 0.88rem;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .field input,
+          .field select {
+            padding: 9px 10px;
+            font-size: 0.85rem;
+          }
+
+          .summary-box strong {
+            font-size: 0.95rem;
+          }
+
+          .submit-button {
+            font-size: 0.82rem;
+            padding: 12px 8px;
           }
         }
       `}</style>

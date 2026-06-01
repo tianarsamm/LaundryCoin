@@ -31,32 +31,33 @@ export default function PemasukanPage() {
   }, [loadData]);
 
   const handleDelete = async (id: string) => {
-    // Optimistic update
     setData((prev) => prev.filter((item) => item.id !== id));
     const ok = await deletePemasukan(id);
     if (!ok) {
-      // Rollback on failure
       await loadData();
       setError("Gagal menghapus transaksi. Silakan coba lagi.");
     }
   };
 
-  const totalPemasukan = data.reduce((sum, item) => sum + item.totalPembayaran, 0);
+  const totalPemasukan = data.reduce(
+    (sum, item) => sum + item.totalPembayaran,
+    0
+  );
 
   return (
     <div className="pemasukan-page">
-      {/* Decorative background glows */}
       <div className="pemasukan-bg-glow glow-pemasukan-1" />
       <div className="pemasukan-bg-glow glow-pemasukan-2" />
 
       <div className="pemasukan-container container">
-        {/* ── Header ── */}
+        {/* Header */}
         <header className="page-header">
-          <div>
+          <div className="page-header-text">
             <p className="page-eyebrow">TRANSAKSI MASUK</p>
             <h1>Catat Pemasukan</h1>
             <p className="page-description">
-              Kelola dan catat transaksi layanan laundry secara instan dengan tarif otomatis.
+              Kelola dan catat transaksi layanan laundry secara instan dengan
+              tarif otomatis.
             </p>
           </div>
           <div className="summary-card glass-panel">
@@ -65,26 +66,41 @@ export default function PemasukanPage() {
           </div>
         </header>
 
-        {/* ── Error banner ── */}
+        {/* Error banner */}
         {error && (
           <div className="error-banner" role="alert">
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="1.8"/>
-              <path d="M12 8v4M12 16h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+              <circle
+                cx="12"
+                cy="12"
+                r="10"
+                stroke="currentColor"
+                strokeWidth="1.8"
+              />
+              <path
+                d="M12 8v4M12 16h.01"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              />
             </svg>
-            {error}
-            <button className="error-dismiss" onClick={() => setError(null)} aria-label="Tutup">✕</button>
+            <span className="error-text">{error}</span>
+            <button
+              className="error-dismiss"
+              onClick={() => setError(null)}
+              aria-label="Tutup"
+            >
+              ✕
+            </button>
           </div>
         )}
 
-        {/* ── Main grid ── */}
+        {/* Main grid */}
         <div className="pemasukan-grid">
-          {/* Form */}
           <section className="form-panel glass-panel">
             <FormPemasukan onSuccess={loadData} />
           </section>
 
-          {/* Table */}
           <section className="table-panel glass-panel">
             <div className="table-header">
               <h2>Riwayat Pemasukan</h2>
@@ -115,7 +131,11 @@ export default function PemasukanPage() {
           position: relative;
           min-height: 100vh;
           padding: 2.5rem 0 5rem;
-          overflow: hidden;
+          /* KRITIS: cegah horizontal scroll */
+          overflow-x: hidden;
+          overflow-y: auto;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         /* ── Decorative glows ── */
@@ -129,19 +149,37 @@ export default function PemasukanPage() {
           animation: pulse 10s infinite alternate;
         }
         .glow-pemasukan-1 {
-          width: 450px; height: 450px;
-          background: radial-gradient(circle, var(--color-primary), transparent 70%);
-          top: -120px; right: -80px;
+          width: 450px;
+          height: 450px;
+          background: radial-gradient(
+            circle,
+            var(--color-primary),
+            transparent 70%
+          );
+          top: -120px;
+          right: -80px;
         }
         .glow-pemasukan-2 {
-          width: 350px; height: 350px;
-          background: radial-gradient(circle, var(--color-success), transparent 70%);
-          bottom: 50px; left: -80px;
+          width: 350px;
+          height: 350px;
+          background: radial-gradient(
+            circle,
+            var(--color-success),
+            transparent 70%
+          );
+          bottom: 50px;
+          left: -80px;
           animation-delay: 2s;
         }
         @keyframes pulse {
-          0%   { transform: translateY(0) scale(1);    opacity: 0.15; }
-          100% { transform: translateY(15px) scale(1.05); opacity: 0.25; }
+          0% {
+            transform: translateY(0) scale(1);
+            opacity: 0.15;
+          }
+          100% {
+            transform: translateY(15px) scale(1.05);
+            opacity: 0.25;
+          }
         }
 
         /* ── Container ── */
@@ -151,6 +189,10 @@ export default function PemasukanPage() {
           display: flex;
           flex-direction: column;
           gap: 1.75rem;
+          /* Pastikan tidak meluap */
+          min-width: 0;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         /* ── Header ── */
@@ -160,7 +202,14 @@ export default function PemasukanPage() {
           align-items: flex-end;
           gap: 1.5rem;
           flex-wrap: wrap;
+          min-width: 0;
         }
+
+        .page-header-text {
+          flex: 1;
+          min-width: 0;
+        }
+
         .page-eyebrow {
           font-size: 0.72rem;
           font-weight: 800;
@@ -190,15 +239,19 @@ export default function PemasukanPage() {
           display: flex;
           flex-direction: column;
           gap: 6px;
-          min-width: 220px;
+          min-width: 200px;
+          max-width: 100%;
           position: relative;
           overflow: hidden;
+          box-sizing: border-box;
         }
         .summary-card::before {
           content: "";
           position: absolute;
-          left: 0; top: 0;
-          width: 4px; height: 100%;
+          left: 0;
+          top: 0;
+          width: 4px;
+          height: 100%;
           background: var(--color-success);
           border-radius: 4px 0 0 4px;
         }
@@ -215,6 +268,8 @@ export default function PemasukanPage() {
           font-weight: 800;
           color: var(--color-success);
           text-shadow: 0 0 12px rgba(16, 185, 129, 0.25);
+          /* Cegah nilai rupiah meluap */
+          word-break: break-all;
         }
 
         /* ── Error banner ── */
@@ -230,12 +285,28 @@ export default function PemasukanPage() {
           font-size: 0.88rem;
           font-weight: 500;
           animation: fadeSlideDown 0.3s ease;
+          box-sizing: border-box;
+          min-width: 0;
         }
+
+        .error-text {
+          flex: 1;
+          min-width: 0;
+          word-break: break-word;
+        }
+
         @keyframes fadeSlideDown {
-          from { opacity: 0; transform: translateY(-8px); }
-          to   { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         .error-dismiss {
+          flex-shrink: 0;
           margin-left: auto;
           background: none;
           border: none;
@@ -246,7 +317,9 @@ export default function PemasukanPage() {
           padding: 0 4px;
           transition: opacity 0.15s;
         }
-        .error-dismiss:hover { opacity: 1; }
+        .error-dismiss:hover {
+          opacity: 1;
+        }
 
         /* ── Grid layout ── */
         .pemasukan-grid {
@@ -254,12 +327,21 @@ export default function PemasukanPage() {
           grid-template-columns: 340px minmax(0, 1fr);
           gap: 1.5rem;
           align-items: start;
+          /* KRITIS: pastikan grid tidak meluap */
+          min-width: 0;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         /* ── Panels ── */
         .form-panel,
         .table-panel {
           padding: 24px;
+          /* Cegah panel meluap */
+          min-width: 0;
+          width: 100%;
+          box-sizing: border-box;
+          overflow: hidden;
         }
 
         /* ── Table header ── */
@@ -269,6 +351,7 @@ export default function PemasukanPage() {
           align-items: center;
           margin-bottom: 1.25rem;
           gap: 1rem;
+          flex-wrap: wrap;
         }
         .table-header h2 {
           margin: 0;
@@ -286,6 +369,7 @@ export default function PemasukanPage() {
           padding: 3px 10px;
           border-radius: 99px;
           white-space: nowrap;
+          flex-shrink: 0;
         }
 
         /* ── Loading state ── */
@@ -300,32 +384,40 @@ export default function PemasukanPage() {
           font-size: 0.88rem;
         }
         .spinner {
-          width: 32px; height: 32px;
+          width: 32px;
+          height: 32px;
           border: 3px solid rgba(255, 255, 255, 0.07);
           border-top-color: var(--color-primary);
           border-radius: 50%;
           animation: spin 0.7s linear infinite;
         }
         @keyframes spin {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
 
-        /* ── Responsive ── */
+        /* ── Responsive breakpoints ── */
+
+        /* Tablet landscape */
         @media (max-width: 1100px) {
           .pemasukan-grid {
             grid-template-columns: 300px minmax(0, 1fr);
           }
         }
 
+        /* Tablet portrait — 1 kolom */
         @media (max-width: 900px) {
           .pemasukan-grid {
             grid-template-columns: 1fr;
           }
           .glow-pemasukan-1 {
-            width: 350px; height: 350px;
+            width: 350px;
+            height: 350px;
           }
           .glow-pemasukan-2 {
-            width: 280px; height: 280px;
+            width: 280px;
+            height: 280px;
           }
         }
 
@@ -342,7 +434,7 @@ export default function PemasukanPage() {
             gap: 1rem;
           }
           .page-header h1 {
-            font-size: clamp(1.5rem, 2.5vw, 2rem);
+            font-size: clamp(1.5rem, 4vw, 2rem);
           }
           .summary-card {
             width: 100%;
@@ -350,6 +442,7 @@ export default function PemasukanPage() {
           }
         }
 
+        /* Mobile */
         @media (max-width: 640px) {
           .pemasukan-page {
             padding: 1rem 0 4rem;
@@ -368,7 +461,7 @@ export default function PemasukanPage() {
             margin-bottom: 0.3rem;
           }
           .page-header h1 {
-            font-size: clamp(1.3rem, 2vw, 1.8rem);
+            font-size: clamp(1.3rem, 5vw, 1.8rem);
           }
           .page-description {
             font-size: 0.85rem;
@@ -376,7 +469,6 @@ export default function PemasukanPage() {
           .summary-card {
             width: 100%;
             padding: 16px 20px;
-            font-size: 0.9rem;
           }
           .summary-card strong {
             font-size: 1.3rem;
@@ -389,13 +481,14 @@ export default function PemasukanPage() {
           .table-header {
             flex-direction: column;
             align-items: flex-start;
-            gap: 0.75rem;
+            gap: 0.5rem;
           }
           .table-header h2 {
             font-size: 1rem;
           }
         }
 
+        /* Small mobile */
         @media (max-width: 480px) {
           .pemasukan-container {
             gap: 1rem;
@@ -409,7 +502,6 @@ export default function PemasukanPage() {
           }
           .summary-card {
             padding: 14px 16px;
-            font-size: 0.8rem;
           }
           .summary-card strong {
             font-size: 1.1rem;
@@ -418,6 +510,20 @@ export default function PemasukanPage() {
             font-size: 0.8rem;
             padding: 10px 12px;
             gap: 8px;
+          }
+        }
+
+        /* Sangat kecil (< 360px) */
+        @media (max-width: 360px) {
+          .form-panel,
+          .table-panel {
+            padding: 10px;
+          }
+          .page-header h1 {
+            font-size: 1.2rem;
+          }
+          .summary-card strong {
+            font-size: 1rem;
           }
         }
       `}</style>

@@ -11,12 +11,8 @@ import {
   LIST_METODE_PEMBAYARAN,
   formatRupiah,
   getTanggalHariIni,
-  
 } from "@/lib/constants";
-import type {
-  LayananTambahan,
-  MetodePembayaran,
-} from "@/lib/supabase/types";
+import type { LayananTambahan, MetodePembayaran } from "@/lib/supabase/types";
 
 interface FormPemasukanProps {
   onSuccess?: () => void;
@@ -47,7 +43,6 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
     addPemasukan({
       tanggal,
       layananUtama,
@@ -57,12 +52,10 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
       totalPembayaran,
       metodePembayaran,
     });
-
     setTanggal(getTanggalHariIni());
     setLayananUtama(LIST_LAYANAN_UTAMA[0]);
     setLayananTambahan([]);
     setMetodePembayaran(LIST_METODE_PEMBAYARAN[0]);
-
     onSuccess?.();
   };
 
@@ -83,7 +76,9 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           <span>Layanan Utama</span>
           <select
             value={layananUtama}
-            onChange={(event) => setLayananUtama(event.target.value as typeof layananUtama)}
+            onChange={(event) =>
+              setLayananUtama(event.target.value as typeof layananUtama)
+            }
           >
             {LIST_LAYANAN_UTAMA.map((layanan) => (
               <option key={layanan} value={layanan}>
@@ -120,7 +115,9 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           <span>Metode Pembayaran</span>
           <select
             value={metodePembayaran}
-            onChange={(event) => setMetodePembayaran(event.target.value as MetodePembayaran)}
+            onChange={(event) =>
+              setMetodePembayaran(event.target.value as MetodePembayaran)
+            }
           >
             {LIST_METODE_PEMBAYARAN.map((method) => (
               <option key={method} value={method}>
@@ -156,6 +153,9 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           display: flex;
           flex-direction: column;
           gap: 1.25rem;
+          /* Pastikan tidak overflow container */
+          min-width: 0;
+          width: 100%;
         }
 
         .form-pemasukan h2 {
@@ -170,12 +170,16 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
         .form-grid {
           display: grid;
           gap: 1.25rem;
+          /* Kritis: cegah overflow ke luar */
+          min-width: 0;
+          width: 100%;
         }
 
         .field {
           display: flex;
           flex-direction: column;
           gap: 6px;
+          min-width: 0;
         }
 
         .field span {
@@ -189,7 +193,9 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
 
         .field input,
         .field select {
+          /* width: 100% + box-sizing agar tidak meluap */
           width: 100%;
+          box-sizing: border-box;
           background: rgba(255, 255, 255, 0.02);
           border: 1px solid rgba(255, 255, 255, 0.06);
           color: #ffffff;
@@ -198,6 +204,10 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           outline: none;
           transition: all 0.25s ease;
           appearance: none;
+          /* Cegah teks meluap */
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .field select {
@@ -224,12 +234,16 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           font-size: 0.78rem;
           font-weight: 500;
           margin-top: 2px;
+          /* Bungkus teks panjang */
+          word-break: break-word;
+          white-space: normal;
         }
 
-        /* Checkbox chips selection */
+        /* Checkbox chips */
         .field--checkbox-group .checkbox-grid {
           display: grid;
           gap: 10px;
+          /* Selalu 1 kolom agar tidak terpotong */
           grid-template-columns: 1fr;
         }
 
@@ -247,9 +261,15 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           font-weight: 500;
           cursor: pointer;
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+          /* Cegah overflow */
+          width: 100%;
+          box-sizing: border-box;
+          min-width: 0;
+          overflow: hidden;
         }
 
         .chip-indicator {
+          flex-shrink: 0;
           width: 8px;
           height: 8px;
           border-radius: 50%;
@@ -284,6 +304,10 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           border-radius: 12px;
           background: rgba(255, 255, 255, 0.01);
           border: 1px solid rgba(255, 255, 255, 0.05);
+          /* Cegah overflow */
+          min-width: 0;
+          width: 100%;
+          box-sizing: border-box;
         }
 
         .summary-row {
@@ -291,16 +315,22 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           justify-content: space-between;
           align-items: center;
           font-size: 0.85rem;
+          gap: 8px;
+          min-width: 0;
         }
 
         .summary-row span {
           color: var(--color-text-muted);
           font-weight: 500;
+          flex-shrink: 0;
         }
 
         .summary-row strong {
           color: #ffffff;
           font-weight: 600;
+          text-align: right;
+          min-width: 0;
+          word-break: break-all;
         }
 
         .summary-divider {
@@ -326,17 +356,22 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           text-shadow: 0 0 8px rgba(99, 102, 241, 0.2);
         }
 
-        /* Submit Button */
+        /* Submit Button — kritis: tidak boleh terpotong */
         .submit-button {
           width: 100%;
+          box-sizing: border-box;
           border-radius: 12px;
-          padding: 14px;
+          padding: 14px 12px;
           background: linear-gradient(135deg, var(--color-primary), #8b5cf6);
           color: #ffffff;
           font-size: 0.92rem;
           font-weight: 700;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
+          /* Cegah teks terpotong */
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
         }
 
         .submit-button:hover {
@@ -349,9 +384,59 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           transform: translateY(0);
         }
 
+        /* Mobile adjustments */
         @media (max-width: 640px) {
           .form-grid {
             gap: 1rem;
+          }
+
+          .form-pemasukan h2 {
+            font-size: 1.1rem;
+          }
+
+          .field input,
+          .field select {
+            padding: 10px 12px;
+            font-size: 0.9rem;
+          }
+
+          .field select {
+            padding-right: 36px;
+          }
+
+          .checkbox-chip {
+            padding: 10px 12px;
+            font-size: 0.85rem;
+          }
+
+          .summary-box {
+            padding: 14px;
+          }
+
+          .summary-total strong {
+            font-size: 1rem;
+          }
+
+          .submit-button {
+            padding: 13px 10px;
+            font-size: 0.88rem;
+          }
+        }
+
+        @media (max-width: 380px) {
+          .field input,
+          .field select {
+            padding: 9px 10px;
+            font-size: 0.85rem;
+          }
+
+          .summary-total strong {
+            font-size: 0.95rem;
+          }
+
+          .submit-button {
+            font-size: 0.82rem;
+            padding: 12px 8px;
           }
         }
       `}</style>
