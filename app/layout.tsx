@@ -19,8 +19,13 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "LaundryKas — Sistem Keuangan Laundry",
-  description: "Aplikasi pencatatan keuangan usaha laundry",
+  title: "Laundry Coin — Sistem Laundry",
+  description: "Sistem Manajemen Usaha Laundry",
+  icons: {
+    icon: "/logo/Laundry2.png",
+    shortcut: "/logo/Laundry2.png",
+    apple: "/logo/Laundry2.png",
+  },
 };
 
 export default function RootLayout({

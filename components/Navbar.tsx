@@ -204,7 +204,7 @@ export default function Navbar() {
               </svg>
             </div>
             <div className="navbar__title-group">
-              <span className="navbar__title">LaundryKas</span>
+              <span className="navbar__title">Laundry Coin</span>
               <span className="navbar__subtitle">Premium Finance</span>
             </div>
           </div>
@@ -232,7 +232,7 @@ export default function Navbar() {
         </ul>
 
         <div className="drawer__footer">
-          <p className="drawer__footer-text">LaundryKas Premium © {new Date().getFullYear()}</p>
+          <p className="drawer__footer-text">Laundry Coin Premium © {new Date().getFullYear()}</p>
         </div>
       </aside>
 
