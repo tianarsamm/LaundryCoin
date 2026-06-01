@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase/client";
@@ -23,7 +23,6 @@ type AttendanceLog = {
   status?: string | null;
 };
 
-// Group logs by date
 function groupByDate(logs: AttendanceLog[]) {
   const map: Record<string, AttendanceLog[]> = {};
   logs.forEach((l) => {
@@ -50,7 +49,6 @@ function getDurasi(checkin: AttendanceLog, checkout: AttendanceLog | undefined) 
   return `${h}j ${m}m`;
 }
 
-// Stats
 function computeStats(logs: AttendanceLog[]) {
   const days = new Set(logs.map(l => new Date(l.created_at).toDateString())).size;
   const checkins = logs.filter(l => l.type === "checkin");
@@ -59,7 +57,8 @@ function computeStats(logs: AttendanceLog[]) {
   return { days, checkins: checkins.length, late, ontime };
 }
 
-export default function RiwayatPage() {
+// ── Komponen isi halaman (pakai useSearchParams di sini) ──
+function RiwayatContent() {
   const searchParams = useSearchParams();
   const id = searchParams?.get("id");
 
@@ -70,7 +69,6 @@ export default function RiwayatPage() {
   const [filterType, setFilterType] = useState<"all" | "checkin" | "checkout">("all");
   const [photoModal, setPhotoModal] = useState<string | null>(null);
 
-  // Load karyawan from sessionStorage
   useEffect(() => {
     if (!id) return;
     try {
@@ -79,7 +77,6 @@ export default function RiwayatPage() {
     } catch {}
   }, [id]);
 
-  // Fetch attendance logs
   useEffect(() => {
     if (!id) return;
     setLoading(true);
@@ -108,7 +105,6 @@ export default function RiwayatPage() {
 
   return (
     <div className="pg">
-      {/* ── Photo Modal ─────────────────────────────────────────── */}
       {photoModal && (
         <div className="photo-overlay" onClick={() => setPhotoModal(null)}>
           <div className="photo-modal">
@@ -119,30 +115,27 @@ export default function RiwayatPage() {
         </div>
       )}
 
-      {/* ── Back + Title ─────────────────────────────────────────── */}
       <div className="topbar">
         <Link href="/manajemen" className="btn-back" style={{ textDecoration: "none", display: "inline-flex", alignItems: "center", gap: "10px" }}>
-        <span style={{
+          <span style={{
             width: "36px", height: "36px", borderRadius: "8px",
             border: "1px solid rgba(51,65,85,0.6)",
             background: "rgba(15,23,42,0.6)",
             display: "flex", alignItems: "center", justifyContent: "center",
             color: "#64748b", flexShrink: 0,
             transition: "border-color 0.15s, transform 0.2s",
-        }}>
+          }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-            <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M19 12H5M5 12l7-7M5 12l7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
             </svg>
-        </span>
-        <span style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
-            {/* <span style={{ fontSize: "11px", color: "#334155", lineHeight: 1 }}>Manajemen Karyawan</span> */}
+          </span>
+          <span style={{ display: "flex", flexDirection: "column", gap: "1px" }}>
             <span style={{ fontSize: "14px", fontWeight: 600, color: "#e2e8f0", lineHeight: 1 }}>Kembali</span>
-        </span>
+          </span>
         </Link>
         <div className="topbar-label">Riwayat Absensi</div>
       </div>
 
-      {/* ── No param ─────────────────────────────────────────────── */}
       {!id && (
         <div className="empty-state">
           <div className="empty-icon">🔍</div>
@@ -153,7 +146,6 @@ export default function RiwayatPage() {
 
       {id && (
         <>
-          {/* ── Karyawan Card ───────────────────────────────────── */}
           {karyawan ? (
             <div className="karyawan-card">
               <div className="karyawan-avatar">{karyawan.nama.charAt(0).toUpperCase()}</div>
@@ -180,7 +172,6 @@ export default function RiwayatPage() {
             </div>
           )}
 
-          {/* ── Stats row ───────────────────────────────────────── */}
           {!loading && riwayat.length > 0 && (
             <div className="stats-row">
               <div className="stat-card">
@@ -202,7 +193,6 @@ export default function RiwayatPage() {
             </div>
           )}
 
-          {/* ── Filter + count ──────────────────────────────────── */}
           <div className="toolbar">
             <div className="filter-group">
               {(["all","checkin","checkout"] as const).map(f => (
@@ -218,7 +208,6 @@ export default function RiwayatPage() {
             <span className="count-badge">{filtered.length} log</span>
           </div>
 
-          {/* ── Loading ─────────────────────────────────────────── */}
           {loading && (
             <div className="loading-wrap">
               <div className="spinner" />
@@ -226,14 +215,12 @@ export default function RiwayatPage() {
             </div>
           )}
 
-          {/* ── Error ───────────────────────────────────────────── */}
           {error && (
             <div className="error-box">
               <span>⚠</span> {error}
             </div>
           )}
 
-          {/* ── Empty ───────────────────────────────────────────── */}
           {!loading && !error && filtered.length === 0 && (
             <div className="empty-state">
               <div className="empty-icon">📋</div>
@@ -241,7 +228,6 @@ export default function RiwayatPage() {
             </div>
           )}
 
-          {/* ── Timeline ────────────────────────────────────────── */}
           {!loading && !error && filtered.length > 0 && (
             <div className="timeline">
               {Object.entries(grouped).map(([date, logs]) => {
@@ -251,15 +237,12 @@ export default function RiwayatPage() {
 
                 return (
                   <div key={date} className="day-group">
-                    {/* Date header */}
                     <div className="day-header">
                       <div className="day-line" />
                       <span className="day-label">{date}</span>
                       {durasi && <span className="day-durasi">⏱ {durasi}</span>}
                       <div className="day-line" />
                     </div>
-
-                    {/* Log items */}
                     <div className="day-logs">
                       {logs.map((log) => {
                         const isIn  = log.type === "checkin";
@@ -268,10 +251,7 @@ export default function RiwayatPage() {
 
                         return (
                           <div key={log.id} className={`log-card ${isIn ? "log-in" : "log-out"}`}>
-                            {/* Left accent */}
                             <div className={`log-accent ${isIn ? "accent-in" : "accent-out"}`} />
-
-                            {/* Icon */}
                             <div className={`log-icon ${isIn ? "icon-in" : "icon-out"}`}>
                               {isIn ? (
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
@@ -283,8 +263,6 @@ export default function RiwayatPage() {
                                 </svg>
                               )}
                             </div>
-
-                            {/* Main info */}
                             <div className="log-body">
                               <div className="log-type-row">
                                 <span className="log-type">{isIn ? "Check In" : isOut ? "Check Out" : log.type}</span>
@@ -305,8 +283,6 @@ export default function RiwayatPage() {
                                 </div>
                               )}
                             </div>
-
-                            {/* Photo */}
                             {log.photo_url && (
                               <button
                                 className="log-photo-btn"
@@ -336,16 +312,11 @@ export default function RiwayatPage() {
       )}
 
       <style jsx>{`
-        /* ── Layout ─────────────────────────────────────────────── */
         .pg { padding:1.5rem; max-width:680px; margin:0 auto; display:flex; flex-direction:column; gap:1rem; padding-bottom:4rem; }
-
-        /* ── Topbar ─────────────────────────────────────────────── */
         .topbar { display:flex; align-items:center; gap:1rem; }
         .btn-back { display:flex; align-items:center; gap:6px; color:#64748b; font-size:0.85rem; font-weight:600; text-decoration:none; transition:color 0.15s; padding:6px 0; }
         .btn-back:hover { color:#e2e8f0; }
         .topbar-label { font-size:0.75rem; font-weight:700; color:#334155; text-transform:uppercase; letter-spacing:0.8px; margin-left:auto; }
-
-        /* ── Karyawan Card ──────────────────────────────────────── */
         .karyawan-card { display:flex; align-items:center; gap:14px; padding:1.25rem; background:rgba(15,23,42,0.7); border:1px solid rgba(51,65,85,0.6); border-radius:16px; }
         .karyawan-card.ghost { opacity:0.5; }
         .karyawan-avatar { width:52px; height:52px; border-radius:14px; background:rgba(99,102,241,0.15); border:1px solid rgba(99,102,241,0.25); display:flex; align-items:center; justify-content:center; font-size:1.4rem; font-weight:800; color:#a5b4fc; flex-shrink:0; }
@@ -356,24 +327,18 @@ export default function RiwayatPage() {
         .dot { color:#1e293b; }
         .wa-link { color:#4ade80; text-decoration:none; }
         .wa-link:hover { text-decoration:underline; }
-
-        /* ── Stats ──────────────────────────────────────────────── */
         .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:0.75rem; }
         .stat-card { padding:1rem; background:rgba(15,23,42,0.6); border:1px solid rgba(51,65,85,0.5); border-radius:12px; display:flex; flex-direction:column; gap:3px; }
         .stat-num { font-size:1.5rem; font-weight:800; color:#fff; }
         .stat-num.green { color:#4ade80; }
         .stat-num.red { color:#f87171; }
         .stat-label { font-size:0.68rem; color:#64748b; font-weight:600; text-transform:uppercase; letter-spacing:0.4px; }
-
-        /* ── Toolbar ─────────────────────────────────────────────── */
         .toolbar { display:flex; align-items:center; justify-content:space-between; gap:0.75rem; flex-wrap:wrap; }
         .filter-group { display:flex; gap:4px; background:rgba(15,23,42,0.6); border:1px solid rgba(51,65,85,0.5); border-radius:10px; padding:4px; }
         .filter-btn { padding:5px 14px; border-radius:7px; border:none; background:none; color:#64748b; font-size:0.78rem; font-weight:600; cursor:pointer; transition:all 0.15s; }
         .filter-btn:hover { color:#e2e8f0; }
         .filter-active { background:rgba(99,102,241,0.2); color:#a5b4fc !important; }
         .count-badge { font-size:0.75rem; color:#475569; font-weight:600; }
-
-        /* ── Loading / Error / Empty ─────────────────────────────── */
         .loading-wrap { display:flex; align-items:center; gap:10px; color:#475569; font-size:0.875rem; padding:1.5rem 0; }
         .spinner { width:20px; height:20px; border:2px solid rgba(99,102,241,0.2); border-top-color:#6366f1; border-radius:50%; animation:spin 0.7s linear infinite; flex-shrink:0; }
         @keyframes spin { to{transform:rotate(360deg)} }
@@ -382,51 +347,33 @@ export default function RiwayatPage() {
         .empty-icon { font-size:2rem; }
         .empty-state p { font-size:0.9rem; margin:0; }
         .btn-primary-sm { padding:0.55rem 1.25rem; background:#6366f1; border-radius:8px; color:#fff; font-size:0.85rem; font-weight:600; text-decoration:none; }
-
-        /* ── Timeline ───────────────────────────────────────────── */
         .timeline { display:flex; flex-direction:column; gap:1.5rem; }
         .day-group { display:flex; flex-direction:column; gap:0.65rem; }
-
-        /* Date header */
         .day-header { display:flex; align-items:center; gap:10px; }
         .day-line { flex:1; height:1px; background:rgba(30,41,59,0.8); }
         .day-label { font-size:0.75rem; font-weight:700; color:#475569; white-space:nowrap; text-transform:capitalize; }
         .day-durasi { font-size:0.72rem; color:#6366f1; background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); padding:2px 8px; border-radius:6px; white-space:nowrap; }
-
-        /* Log card */
         .day-logs { display:flex; flex-direction:column; gap:8px; }
         .log-card { display:flex; align-items:center; gap:12px; padding:0.9rem 1rem 0.9rem 0; background:rgba(15,23,42,0.6); border:1px solid rgba(51,65,85,0.5); border-radius:12px; overflow:hidden; transition:border-color 0.15s; position:relative; }
         .log-card:hover { border-color:rgba(99,102,241,0.3); }
-
-        /* Accent bar */
         .log-accent { width:3px; height:100%; position:absolute; left:0; top:0; flex-shrink:0; }
         .accent-in { background:linear-gradient(180deg,#3b82f6,#2563eb); }
         .accent-out { background:linear-gradient(180deg,#f43f5e,#e11d48); }
-
-        /* Icon */
         .log-icon { width:32px; height:32px; border-radius:9px; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-left:14px; }
         .icon-in  { background:rgba(59,130,246,0.12); color:#60a5fa; border:1px solid rgba(59,130,246,0.2); }
         .icon-out { background:rgba(244,63,94,0.1); color:#fb7185; border:1px solid rgba(244,63,94,0.15); }
-
-        /* Body */
         .log-body { flex:1; min-width:0; }
         .log-type-row { display:flex; align-items:center; gap:8px; margin-bottom:3px; }
         .log-type { font-size:0.875rem; font-weight:700; color:#e2e8f0; }
         .log-time { font-size:1.05rem; font-weight:800; color:#fff; font-variant-numeric:tabular-nums; margin-bottom:4px; }
         .log-distance { display:flex; align-items:center; gap:4px; font-size:0.72rem; color:#475569; }
-
-        /* Status badge */
         .log-status { font-size:0.68rem; font-weight:700; padding:2px 8px; border-radius:100px; }
         .status-ontime { background:rgba(74,222,128,0.1); color:#4ade80; border:1px solid rgba(74,222,128,0.2); }
         .status-late   { background:rgba(248,113,113,0.1); color:#f87171; border:1px solid rgba(248,113,113,0.2); }
-
-        /* Photo */
         .log-photo-btn { width:52px; height:52px; border-radius:10px; overflow:hidden; border:none; cursor:pointer; padding:0; position:relative; flex-shrink:0; margin-right:12px; }
         .log-thumb { width:100%; height:100%; object-fit:cover; display:block; }
         .log-photo-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.4); display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity 0.15s; }
         .log-photo-btn:hover .log-photo-overlay { opacity:1; }
-
-        /* ── Photo Modal ────────────────────────────────────────── */
         .photo-overlay { position:fixed; inset:0; z-index:100; background:rgba(0,0,0,0.85); backdrop-filter:blur(8px); display:flex; align-items:center; justify-content:center; padding:1rem; animation:fadeIn 0.15s; }
         @keyframes fadeIn { from{opacity:0}to{opacity:1} }
         .photo-modal { position:relative; max-width:500px; width:100%; animation:scaleIn 0.2s; }
@@ -434,8 +381,6 @@ export default function RiwayatPage() {
         .photo-close { position:absolute; top:-14px; right:-14px; width:32px; height:32px; border-radius:50%; background:#1e293b; border:1px solid rgba(51,65,85,0.8); color:#94a3b8; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:1; }
         .photo-close:hover { color:#fff; }
         .photo-img { width:100%; border-radius:14px; display:block; }
-
-        /* ── Responsive ─────────────────────────────────────────── */
         @media(max-width:500px) {
           .stats-row { grid-template-columns:repeat(2,1fr); }
           .karyawan-sub { flex-direction:column; align-items:flex-start; gap:3px; }
@@ -443,5 +388,19 @@ export default function RiwayatPage() {
         }
       `}</style>
     </div>
+  );
+}
+
+// ── Komponen utama: bungkus dengan Suspense ──
+export default function RiwayatPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", color: "#475569", gap: "10px" }}>
+        <div style={{ width: "20px", height: "20px", border: "2px solid rgba(99,102,241,0.2)", borderTopColor: "#6366f1", borderRadius: "50%", animation: "spin 0.7s linear infinite" }} />
+        Memuat halaman…
+      </div>
+    }>
+      <RiwayatContent />
+    </Suspense>
   );
 }
