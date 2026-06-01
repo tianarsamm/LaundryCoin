@@ -217,9 +217,13 @@ export default function IzinSakitPage() {
   const fetchList = useCallback(async () => {
     setLoading(true);
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Sesi tidak ditemukan, silakan login ulang.");
+
       const { data, error } = await supabase
         .from("leave_requests")
         .select("id,leave_type,leave_status,tanggal_mulai,tanggal_selesai,keterangan,catatan_admin,created_at,reviewed_at")
+        .eq("user_id", user.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
       setList((data ?? []) as LeaveRequest[]);
