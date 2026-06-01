@@ -673,7 +673,29 @@ export default function LaporanPage() {
           font-size: 0.88rem;
         }
 
+        @media (max-width: 1024px) {
+          .laporan-container {
+            gap: 1.5rem;
+          }
+          .summary-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 1.2rem;
+          }
+          .summary-card {
+            padding: 20px;
+          }
+          .summary-card strong {
+            font-size: 1.5rem;
+          }
+        }
+
         @media (max-width: 900px) {
+          .laporan-page {
+            padding: 1.5rem 0 4rem;
+          }
+          .laporan-container {
+            gap: 1.25rem;
+          }
           .summary-grid,
           .breakdown-grid {
             grid-template-columns: 1fr;
@@ -682,9 +704,12 @@ export default function LaporanPage() {
           .period-card {
             width: 100%;
             justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
           }
           .period-label {
             flex: 1;
+            min-width: 150px;
           }
           .period-label input {
             width: 100%;
@@ -692,12 +717,255 @@ export default function LaporanPage() {
           .period-connector {
             display: none;
           }
-        }
-
-        @media (max-width: 768px) {
           .page-header {
             flex-direction: column;
             align-items: flex-start;
+            gap: 1rem;
+          }
+          .page-header h1 {
+            font-size: clamp(1.6rem, 2.5vw, 2rem);
+          }
+          .glow-laporan-1,
+          .glow-laporan-2 {
+            filter: blur(80px);
+            width: 350px;
+            height: 350px;
+          }
+        }
+
+        @media (max-width: 768px) {
+          .laporan-page {
+            padding: 1.25rem 0 3.5rem;
+          }
+          .laporan-container {
+            gap: 1rem;
+          }
+          .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+          }
+          .page-eyebrow {
+            font-size: 0.65rem;
+            margin-bottom: 0.3rem;
+            letter-spacing: 1.5px;
+          }
+          .page-header h1 {
+            font-size: clamp(1.4rem, 2vw, 1.8rem);
+            letter-spacing: -0.6px;
+            gap: 0.5rem;
+          }
+          .page-description {
+            font-size: 0.85rem;
+          }
+          .period-card {
+            flex-direction: column;
+            padding: 12px 16px;
+            gap: 8px;
+          }
+          .period-label {
+            width: 100%;
+          }
+          .period-label span {
+            font-size: 0.6rem;
+            letter-spacing: 0.5px;
+          }
+          .period-label input {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+          }
+          .summary-grid {
+            grid-template-columns: 1fr;
+            gap: 0.875rem;
+          }
+          .summary-card {
+            padding: 16px;
+          }
+          .summary-card span {
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+          }
+          .summary-card strong {
+            font-size: 1.3rem;
+          }
+          .breakdown-grid {
+            gap: 0.875rem;
+          }
+          .breakdown-card {
+            padding: 18px;
+          }
+          .breakdown-header h2 {
+            font-size: 1rem;
+          }
+          .breakdown-header span {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+          }
+          .breakdown-item {
+            padding: 12px 14px;
+            border-radius: 10px;
+          }
+          .breakdown-item__progress {
+            height: 2px;
+          }
+          .empty-text {
+            font-size: 0.85rem;
+            padding: 1.5rem 0;
+          }
+          .traffic-card {
+            flex-direction: column;
+            align-items: flex-start;
+            padding: 16px;
+            gap: 12px;
+          }
+          .traffic-icon {
+            width: 40px;
+            height: 40px;
+            font-size: 1.5rem;
+          }
+          .traffic-card h2 {
+            font-size: 0.95rem;
+          }
+          .traffic-card p {
+            font-size: 0.8rem;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .laporan-page {
+            padding: 1rem 0 3rem;
+          }
+          .laporan-container {
+            gap: 0.875rem;
+          }
+          .page-header h1 {
+            font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+          }
+          .period-card {
+            padding: 10px 14px;
+            gap: 6px;
+            flex-direction: column;
+          }
+          .period-label {
+            width: 100%;
+          }
+          .period-label span {
+            font-size: 0.6rem;
+          }
+          .period-label input {
+            padding: 5px 8px;
+            font-size: 0.75rem;
+          }
+          .summary-grid {
+            gap: 0.75rem;
+          }
+          .summary-card {
+            padding: 14px;
+          }
+          .summary-card span {
+            font-size: 0.7rem;
+          }
+          .summary-card strong {
+            font-size: 1.2rem;
+          }
+          .breakdown-card {
+            padding: 14px;
+          }
+          .breakdown-header {
+            margin-bottom: 1rem;
+            gap: 10px;
+          }
+          .breakdown-header h2 {
+            font-size: 0.9rem;
+          }
+          .breakdown-list {
+            gap: 8px;
+          }
+          .breakdown-item {
+            padding: 10px 12px;
+            gap: 6px;
+            font-size: 0.8rem;
+          }
+          .breakdown-item__name {
+            font-size: 0.8rem;
+          }
+          .breakdown-item__value {
+            font-size: 0.8rem;
+          }
+          .traffic-card {
+            padding: 14px;
+            gap: 10px;
+          }
+          .glow-laporan-1,
+          .glow-laporan-2 {
+            filter: blur(70px);
+            width: 280px;
+            height: 280px;
+            opacity: 0.12;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .laporan-page {
+            padding: 0.75rem 0 2.5rem;
+          }
+          .page-header h1 {
+            font-size: 1.3rem;
+          }
+          .page-description {
+            font-size: 0.8rem;
+          }
+          .period-card {
+            padding: 8px 12px;
+          }
+          .period-label input {
+            font-size: 0.7rem;
+            padding: 4px 6px;
+          }
+          .summary-grid {
+            gap: 0.6rem;
+          }
+          .summary-card {
+            padding: 12px;
+          }
+          .summary-card span {
+            font-size: 0.65rem;
+          }
+          .summary-card strong {
+            font-size: 1.1rem;
+          }
+          .breakdown-card {
+            padding: 12px;
+          }
+          .breakdown-header {
+            margin-bottom: 0.75rem;
+          }
+          .breakdown-header h2 {
+            font-size: 0.85rem;
+          }
+          .breakdown-header span {
+            font-size: 0.65rem;
+            padding: 1px 4px;
+          }
+          .breakdown-item {
+            padding: 8px 10px;
+            font-size: 0.7rem;
+          }
+          .traffic-card {
+            padding: 12px;
+          }
+          .traffic-icon {
+            width: 36px;
+            height: 36px;
+            font-size: 1.3rem;
+          }
+          .traffic-card h2 {
+            font-size: 0.85rem;
+            margin: 0 0 2px;
+          }
+          .traffic-card p {
+            font-size: 0.75rem;
           }
         }
       `}</style>

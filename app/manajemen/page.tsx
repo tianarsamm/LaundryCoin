@@ -593,11 +593,80 @@ export default function ManajemenKaryawanPage() {
         .action-edit:hover  { background:rgba(99,102,241,0.2); color:#a5b4fc; }
         .action-trash:hover { background:rgba(244,63,94,0.15); color:#fda4af; }
         .action-group { display:inline-flex; gap:6px; align-items:center; }
-        @media (max-width:768px) {
-          .page { padding:1rem; }
+        @media (max-width: 1024px) {
           .stats-row { grid-template-columns:repeat(2,1fr); }
-          .page-header { flex-direction:column; }
-          .btn-add { width:100%; justify-content:center; }
+          .search-wrap { max-width: 100%; }
+          th { font-size:0.7rem; padding:0.8rem 0.8rem; }
+          td { padding:0.8rem; font-size:0.82rem; }
+        }
+        @media (max-width: 768px) {
+          .page { padding:1rem; gap:1.25rem; }
+          .page-header { flex-direction:column; align-items:flex-start; gap:0.75rem; }
+          .page-header h1 { font-size:clamp(1.3rem,2vw,1.8rem); }
+          .page-header p { font-size:0.8rem; }
+          .btn-add { width:100%; justify-content:center; padding:0.65rem 1rem; }
+          .stats-row { grid-template-columns:repeat(2,1fr); gap:0.875rem; }
+          .stat-card { padding:1rem; }
+          .stat-num { font-size:1.5rem; }
+          .stat-label { font-size:0.7rem; }
+          .toolbar { flex-direction:column; align-items:flex-start; padding:1rem; }
+          .search-wrap { width:100%; max-width: none; }
+          .count-label { width:100%; text-align:right; }
+          th { font-size:0.65rem; padding:0.7rem 0.6rem; }
+          td { padding:0.7rem 0.6rem; font-size:0.78rem; }
+          .karyawan-cell { gap:8px; }
+          .avatar { width:30px; height:30px; font-size:0.8rem; }
+          .karyawan-nama { font-size:0.8rem; }
+          .karyawan-meta { font-size:0.68rem; }
+          .action-btn { width:28px; height:28px; font-size:0.75rem; }
+          .badge { font-size:0.68rem; padding:2px 8px; }
+        }
+        @media (max-width: 640px) {
+          .page { padding:0.75rem; gap:1rem; }
+          .page-header h1 { font-size:clamp(1.2rem,1.8vw,1.5rem); letter-spacing:-0.3px; }
+          .page-header p { font-size:0.75rem; }
+          .btn-add { font-size:0.8rem; padding:0.6rem 1rem; }
+          .stats-row { grid-template-columns:1fr; gap:0.75rem; }
+          .stat-card { padding:0.9rem 1.1rem; }
+          .stat-num { font-size:1.3rem; }
+          .stat-label { font-size:0.65rem; letter-spacing:0.3px; }
+          .table-card { border-radius:12px; }
+          .toolbar { padding:0.9rem; gap:0.75rem; }
+          .search-wrap { padding:0.5rem 0.8rem; font-size:0.75rem; }
+          .search-wrap input { font-size:0.8rem; }
+          .count-label { font-size:0.75rem; }
+          .table-scroll { border-radius:8px; }
+          th { font-size:0.6rem; padding:0.6rem 0.5rem; }
+          th.th-center { padding:0.6rem 0.3rem; }
+          td { padding:0.6rem 0.5rem; font-size:0.75rem; }
+          td.td-num { width:35px; }
+          td.td-center { padding:0.5rem 0.3rem; }
+          .empty { padding:2rem 0.75rem; font-size:0.8rem; }
+          .karyawan-cell { gap:6px; }
+          .avatar { width:28px; height:28px; font-size:0.75rem; }
+          .karyawan-nama { font-size:0.75rem; }
+          .karyawan-meta { font-size:0.65rem; }
+          .wa-link { font-size:0.78rem; }
+          .action-btn { width:26px; height:26px; }
+          .action-group { gap:4px; }
+          .badge { font-size:0.6rem; padding:2px 6px; }
+          .status { font-size:0.72rem; }
+        }
+        @media (max-width: 480px) {
+          .page { padding:0.5rem; }
+          .page-header { gap:0.5rem; }
+          .page-header h1 { font-size:1.3rem; }
+          .stats-row { gap:0.6rem; }
+          .stat-card { padding:0.8rem 1rem; }
+          .stat-num { font-size:1.2rem; }
+          .stat-label { font-size:0.6rem; }
+          .toolbar { padding:0.8rem; gap:0.5rem; }
+          .search-wrap { padding:0.45rem 0.7rem; font-size:0.72rem; }
+          th { font-size:0.55rem; padding:0.5rem 0.4rem; }
+          td { padding:0.5rem 0.4rem; font-size:0.7rem; }
+          .karyawan-cell { gap:5px; }
+          .avatar { width:26px; height:26px; }
+          .action-btn { width:24px; height:24px; }
         }
       `}</style>
     </div>

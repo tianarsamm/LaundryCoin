@@ -381,6 +381,84 @@ function RiwayatContent() {
         .photo-close { position:absolute; top:-14px; right:-14px; width:32px; height:32px; border-radius:50%; background:#1e293b; border:1px solid rgba(51,65,85,0.8); color:#94a3b8; font-size:14px; cursor:pointer; display:flex; align-items:center; justify-content:center; z-index:1; }
         .photo-close:hover { color:#fff; }
         .photo-img { width:100%; border-radius:14px; display:block; }
+        
+        @media (max-width: 768px) {
+          .pg { padding: 1.25rem; gap: 0.875rem; }
+          .topbar { gap: 0.75rem; }
+          .btn-back { font-size: 0.8rem; }
+          .topbar-label { font-size: 0.7rem; }
+          .karyawan-card { padding: 1.1rem; gap: 12px; border-radius: 14px; }
+          .karyawan-avatar { width: 48px; height: 48px; font-size: 1.3rem; }
+          .karyawan-nama { font-size: 1rem; }
+          .karyawan-sub { font-size: 0.75rem; }
+          .badge-role { font-size: 0.65rem; }
+          .stats-row { grid-template-columns: repeat(2, 1fr); gap: 0.625rem; }
+          .stat-card { padding: 0.9rem; }
+          .stat-num { font-size: 1.3rem; }
+          .stat-label { font-size: 0.65rem; }
+          .filter-btn { padding: 4px 12px; font-size: 0.73rem; }
+          .count-badge { font-size: 0.7rem; }
+          .day-label { font-size: 0.7rem; }
+          .log-card { padding: 0.85rem 1rem 0.85rem 0; }
+          .log-icon { width: 30px; height: 30px; margin-left: 12px; }
+          .log-type { font-size: 0.82rem; }
+          .log-time { font-size: 1rem; }
+          .log-distance { font-size: 0.68rem; }
+          .log-photo-btn { width: 48px; height: 48px; margin-right: 10px; }
+        }
+
+        @media (max-width: 640px) {
+          .pg { padding: 1rem; gap: 0.75rem; padding-bottom: 3.5rem; }
+          .topbar { gap: 0.5rem; flex-direction: column; align-items: flex-start; }
+          .btn-back { font-size: 0.75rem; }
+          .topbar-label { margin-left: 0; margin-top: 0.25rem; }
+          .karyawan-card { padding: 1rem; gap: 10px; }
+          .karyawan-avatar { width: 44px; height: 44px; font-size: 1.2rem; }
+          .karyawan-nama { font-size: 0.95rem; }
+          .karyawan-sub { font-size: 0.7rem; flex-direction: column; gap: 2px; }
+          .badge-role { font-size: 0.62rem; padding: 1px 6px; }
+          .stats-row { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+          .stat-card { padding: 0.8rem; }
+          .stat-num { font-size: 1.2rem; }
+          .stat-label { font-size: 0.6rem; }
+          .toolbar { gap: 0.5rem; }
+          .filter-group { padding: 3px; }
+          .filter-btn { padding: 3px 10px; font-size: 0.7rem; }
+          .count-badge { font-size: 0.65rem; }
+          .day-header { gap: 8px; }
+          .day-line { display: none; }
+          .day-label { font-size: 0.68rem; }
+          .day-durasi { font-size: 0.65rem; padding: 1px 6px; }
+          .day-logs { gap: 6px; }
+          .log-card { padding: 0.75rem 1rem 0.75rem 0; border-radius: 10px; }
+          .log-accent { width: 2px; }
+          .log-icon { width: 28px; height: 28px; margin-left: 10px; }
+          .log-icon svg { width: 13px; height: 13px; }
+          .log-type { font-size: 0.78rem; }
+          .log-time { font-size: 0.95rem; }
+          .log-distance { font-size: 0.65rem; }
+          .log-status { font-size: 0.62rem; padding: 1px 6px; }
+          .log-photo-btn { width: 44px; height: 44px; margin-right: 8px; border-radius: 8px; }
+          .photo-close { width: 28px; height: 28px; font-size: 12px; top: -8px; right: -8px; }
+        }
+
+        @media (max-width: 480px) {
+          .pg { padding: 0.75rem; }
+          .karyawan-avatar { width: 40px; height: 40px; font-size: 1.1rem; }
+          .karyawan-nama { font-size: 0.9rem; }
+          .stats-row { grid-template-columns: 1fr; gap: 0.5rem; }
+          .stat-num { font-size: 1.1rem; }
+          .stat-label { font-size: 0.55rem; }
+          .filter-btn { padding: 2px 8px; font-size: 0.65rem; }
+          .day-label { font-size: 0.65rem; }
+          .log-card { padding: 0.65rem 1rem 0.65rem 0; }
+          .log-icon { width: 26px; height: 26px; margin-left: 8px; }
+          .log-icon svg { width: 12px; height: 12px; }
+          .log-type { font-size: 0.75rem; }
+          .log-time { font-size: 0.9rem; }
+          .log-photo-btn { width: 40px; height: 40px; margin-right: 6px; }
+        }
+
         @media(max-width:500px) {
           .stats-row { grid-template-columns:repeat(2,1fr); }
           .karyawan-sub { flex-direction:column; align-items:flex-start; gap:3px; }

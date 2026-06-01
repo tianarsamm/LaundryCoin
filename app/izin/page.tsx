@@ -197,11 +197,75 @@ function ModalSubmit({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
         .calc-note{font-size:0.72rem;color:#475569}
         .mfoot{display:flex;justify-content:flex-end;gap:0.75rem;padding-top:0.25rem}
         .btn-sec{padding:0.65rem 1.2rem;background:rgba(30,41,59,0.6);border:1px solid rgba(51,65,85,0.8);border-radius:8px;color:#94a3b8;font-size:0.875rem;font-weight:600;cursor:pointer}
-        .btn-sec:hover{color:#e2e8f0}
-        .btn-pri{padding:0.65rem 1.4rem;background:#6366f1;border:none;border-radius:8px;color:#fff;font-size:0.875rem;font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(99,102,241,0.3)}
-        .btn-pri:hover{background:#4f46e5}
-        .btn-pri:disabled{opacity:0.5;cursor:not-allowed}
-        @media(max-width:480px){.row2{grid-template-columns:1fr}}
+        @media (max-width: 768px) {
+          .pg { padding: 1.25rem; gap: 1rem; }
+          .header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+          .header h1 { font-size: 1.4rem; }
+          .header p { font-size: 0.8rem; }
+          .btn-add { width: 100%; justify-content: center; padding: 0.6rem 1rem; font-size: 0.82rem; }
+          .stats { grid-template-columns: repeat(2, 1fr); gap: 0.625rem; }
+          .stat-card { padding: 0.9rem; border-radius: 10px; }
+          .stat-num { font-size: 1.2rem; }
+          .stat-lbl { font-size: 0.65rem; }
+          .card { border-radius: 12px; }
+          .item { padding: 0.9rem 1rem; gap: 10px; }
+          .item-icon { width: 32px; height: 32px; font-size: 1rem; }
+          .item-type { font-size: 0.85rem; }
+          .item-badge { font-size: 0.65rem; padding: 2px 7px; }
+          .item-dates { font-size: 0.75rem; }
+          .item-dur { font-size: 0.65rem; padding: 1px 5px; }
+          .item-ket { font-size: 0.75rem; }
+          .item-pot { font-size: 0.82rem; }
+          .item-date-sub { font-size: 0.68rem; }
+        }
+        @media (max-width: 640px) {
+          .pg { padding: 1rem; gap: 0.875rem; padding-bottom: 3.5rem; }
+          .header h1 { font-size: clamp(1.2rem, 1.8vw, 1.5rem); }
+          .header p { font-size: 0.77rem; }
+          .btn-add { padding: 0.55rem 0.9rem; font-size: 0.8rem; }
+          .notif-success { padding: 10px 14px; font-size: 0.8rem; border-radius: 10px; }
+          .stats { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+          .stat-card { padding: 0.8rem; border-radius: 9px; }
+          .stat-num { font-size: 1.1rem; }
+          .stat-lbl { font-size: 0.6rem; letter-spacing: 0.3px; }
+          .item { padding: 0.8rem 0.9rem; }
+          .item-icon { width: 30px; height: 30px; }
+          .item-type { font-size: 0.8rem; }
+          .item-badge { font-size: 0.6rem; padding: 1px 6px; }
+          .item-dates { font-size: 0.72rem; gap: 4px; }
+          .item-dur { font-size: 0.6rem; padding: 1px 4px; }
+          .item-ket { font-size: 0.72rem; }
+          .item-admin-note { font-size: 0.75rem; padding: 4px 8px; }
+          .item-pot { font-size: 0.8rem; }
+          .item-date-sub { font-size: 0.65rem; }
+          .btn-add-sm { padding: 0.5rem 0.9rem; font-size: 0.78rem; }
+          .empty { padding: 2.5rem 0.75rem; }
+          .empty-icon { font-size: 1.8rem; }
+        }
+        @media (max-width: 480px) {
+          .pg { padding: 0.75rem; }
+          .header h1 { font-size: 1.3rem; letter-spacing: -0.2px; }
+          .header p { font-size: 0.75rem; }
+          .btn-add { padding: 0.5rem 0.8rem; font-size: 0.75rem; }
+          .stats { grid-template-columns: 1fr; gap: 0.5rem; }
+          .stat-card { padding: 0.75rem; }
+          .stat-num { font-size: 1rem; }
+          .stat-lbl { font-size: 0.58rem; }
+          .item { padding: 0.7rem 0.8rem; gap: 8px; }
+          .item-icon { width: 28px; height: 28px; font-size: 0.95rem; }
+          .item-type { font-size: 0.75rem; }
+          .item-dates { font-size: 0.68rem; }
+          .item-ket { font-size: 0.68rem; }
+          .item-right { gap: 3px; }
+          .btn-add-sm { padding: 0.45rem 0.8rem; font-size: 0.75rem; }
+        }
+        @media (max-width: 360px) {
+          .pg { padding: 0.5rem; }
+          .header h1 { font-size: 1.2rem; }
+          .stats { grid-template-columns: 1fr; }
+          .item { padding: 0.6rem 0.7rem; }
+          .item-icon { width: 26px; height: 26px; }
+        }
       `}</style>
     </div>
   );

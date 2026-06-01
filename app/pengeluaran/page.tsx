@@ -320,21 +320,100 @@ export default function PengeluaranPage() {
           .pengeluaran-grid {
             grid-template-columns: 1fr;
           }
+          .glow-pengeluaran-1 {
+            width: 350px; height: 350px;
+          }
+          .glow-pengeluaran-2 {
+            width: 280px; height: 280px;
+          }
         }
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
           .pengeluaran-page {
-            padding: 1.25rem 0 4rem;
+            padding: 1.5rem 0 4rem;
+          }
+          .pengeluaran-container {
+            gap: 1.25rem;
           }
           .page-header {
             flex-direction: column;
             align-items: flex-start;
+            gap: 1rem;
+          }
+          .page-header h1 {
+            font-size: clamp(1.5rem, 2.5vw, 2rem);
           }
           .summary-card {
             width: 100%;
+            min-width: auto;
+          }
+        }
+        @media (max-width: 640px) {
+          .pengeluaran-page {
+            padding: 1rem 0 4rem;
           }
           .form-panel,
           .table-panel {
-            padding: 18px 16px;
+            padding: 16px;
+          }
+          .page-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+          }
+          .page-eyebrow {
+            font-size: 0.65rem;
+            margin-bottom: 0.3rem;
+          }
+          .page-header h1 {
+            font-size: clamp(1.3rem, 2vw, 1.8rem);
+          }
+          .page-description {
+            font-size: 0.85rem;
+          }
+          .summary-card {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 0.9rem;
+          }
+          .summary-card strong {
+            font-size: 1.3rem;
+          }
+          .glow-pengeluaran-1,
+          .glow-pengeluaran-2 {
+            filter: blur(80px);
+            opacity: 0.12;
+          }
+          .table-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.75rem;
+          }
+          .table-header h2 {
+            font-size: 1rem;
+          }
+        }
+        @media (max-width: 480px) {
+          .pengeluaran-container {
+            gap: 1rem;
+          }
+          .form-panel,
+          .table-panel {
+            padding: 12px;
+          }
+          .page-header h1 {
+            font-size: 1.4rem;
+          }
+          .summary-card {
+            padding: 14px 16px;
+            font-size: 0.8rem;
+          }
+          .summary-card strong {
+            font-size: 1.1rem;
+          }
+          .error-banner {
+            font-size: 0.8rem;
+            padding: 10px 12px;
+            gap: 8px;
           }
         }
       `}</style>

@@ -603,6 +603,11 @@ export default function DashboardPage() {
         }
 
         /* ── Responsive ── */
+        @media (max-width: 1200px) {
+          .stat-grid {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+        }
         @media (max-width: 1100px) {
           .dashboard-main-grid {
             grid-template-columns: 3fr 2fr;
@@ -616,52 +621,176 @@ export default function DashboardPage() {
             grid-template-columns: repeat(3, minmax(0, 1fr));
           }
         }
-        @media (max-width: 640px) {
+        @media (max-width: 768px) {
           .dashboard-page {
-            padding: 1.25rem 0 4rem;
+            padding: 1.5rem 0 4rem;
           }
           .dashboard-container {
             gap: 1.25rem;
           }
-          .stat-grid,
-          .skeleton-grid {
-            grid-template-columns: 1fr;
-            gap: 0.875rem;
-          }
           .dashboard-header {
             flex-direction: column;
             align-items: flex-start;
-            gap: 1rem;
+            gap: 0.75rem;
+          }
+          .dashboard-title {
+            font-size: clamp(1.5rem, 2.5vw, 2rem);
           }
           .filter-group {
             width: 100%;
-            border-radius: 14px;
-            padding: 4px;
+            border-radius: 12px;
           }
           .filter-button {
             flex: 1;
-            text-align: center;
-            padding: 0.55rem 0.5rem;
-            font-size: 0.78rem;
+            min-width: 70px;
+            padding: 0.5rem 0.4rem;
+            font-size: 0.76rem;
+          }
+          .stat-grid {
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
           }
           .chart-card,
           .recent-card {
             padding: 18px 16px;
           }
           .chart-card__body {
-            height: 220px;
+            height: 240px;
           }
           .card-header h2 {
-            font-size: 0.95rem;
+            font-size: 1rem;
           }
         }
-        @media (max-width: 400px) {
+        @media (max-width: 640px) {
+          .dashboard-page {
+            padding: 1rem 0 4rem;
+          }
+          .dashboard-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+          }
           .dashboard-title {
-            font-size: 1.65rem;
+            font-size: clamp(1.3rem, 2vw, 1.8rem);
+            letter-spacing: -0.6px;
+          }
+          .dashboard-subtitle {
+            font-size: 0.8rem;
+          }
+          .dashboard-eyebrow {
+            font-size: 0.65rem;
+            margin-bottom: 0.2rem;
+          }
+          .stat-grid,
+          .skeleton-grid {
+            grid-template-columns: 1fr;
+            gap: 0.875rem;
+          }
+          .stat-card {
+            padding: 1rem 1.2rem;
+          }
+          .filter-group {
+            width: 100%;
+            padding: 3px;
+            border-radius: 10px;
           }
           .filter-button {
-            font-size: 0.72rem;
-            padding: 0.5rem 0.35rem;
+            padding: 0.5rem 0.3rem;
+            font-size: 0.7rem;
+          }
+          .chart-card,
+          .recent-card {
+            padding: 14px;
+          }
+          .chart-card__body {
+            height: 200px;
+          }
+          .card-header {
+            margin-bottom: 16px;
+            gap: 8px;
+          }
+          .card-header h2 {
+            font-size: 0.9rem;
+          }
+          .recent-list {
+            gap: 6px;
+          }
+          .recent-item {
+            padding: 10px 12px;
+            gap: 10px;
+          }
+          .recent-item__icon {
+            width: 32px; height: 32px;
+          }
+          .recent-name {
+            font-size: 0.8rem;
+          }
+          .recent-meta {
+            font-size: 0.7rem;
+          }
+          .recent-value {
+            font-size: 0.8rem;
+          }
+          .empty-state {
+            padding: 2rem 1rem;
+          }
+          .empty-icon-wrap {
+            width: 60px; height: 60px;
+          }
+          .empty-title {
+            font-size: 0.9rem;
+          }
+          .empty-sub {
+            font-size: 0.75rem;
+          }
+          .glow-1,
+          .glow-2 {
+            filter: blur(80px);
+            opacity: 0.12;
+          }
+        }
+        @media (max-width: 480px) {
+          .dashboard-page {
+            padding: 0.75rem 0 3.5rem;
+          }
+          .dashboard-container {
+            gap: 1rem;
+          }
+          .dashboard-title {
+            font-size: 1.4rem;
+          }
+          .filter-button {
+            font-size: 0.65rem;
+            padding: 0.45rem 0.2rem;
+          }
+          .stat-card {
+            padding: 0.9rem 1rem;
+          }
+          .stat-num {
+            font-size: 1.5rem;
+          }
+          .stat-label {
+            font-size: 0.7rem;
+          }
+          .chart-card,
+          .recent-card {
+            padding: 12px;
+          }
+          .chart-card__body {
+            height: 180px;
+          }
+          .card-header {
+            margin-bottom: 12px;
+          }
+          .card-header__dot {
+            width: 6px; height: 6px;
+          }
+          .recent-item {
+            padding: 8px 10px;
+          }
+          .recent-item__icon {
+            width: 28px; height: 28px;
+            font-size: 0.8rem;
           }
         }
       `}</style>

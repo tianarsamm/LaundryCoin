@@ -879,8 +879,76 @@ function GajiPageInner() {
         .form-field label { font-size:0.78rem;font-weight:700;color:#64748b; }
         .form-field input, .form-field select { padding:0.65rem 0.9rem;background:rgba(15,23,42,0.7);border:1px solid rgba(51,65,85,0.7);border-radius:8px;color:#e2e8f0;font-size:0.875rem;transition:border 0.2s; }
         .form-field input:focus, .form-field select:focus { border-color:#6366f1;outline:none;box-shadow:0 0 0 3px rgba(99,102,241,0.15); }
-        @media (max-width:768px) {
-          .pg { padding:1rem; }
+        @media (max-width:768px) {          .pg { padding: 1.5rem; gap: 1rem; }
+          .emp-stats { display: none; }
+          .emp-header { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
+          .emp-nama { font-size: 1rem; }
+          .emp-meta { font-size: 0.75rem; }
+          .tabs { gap: 0; overflow-x: auto; }
+          .tab-btn { padding: 0.55rem 1rem; font-size: 0.8rem; }
+          .content { padding: 1.25rem; }
+          .info-grid { grid-template-columns: repeat(2, 1fr); gap: 0.875rem; }
+          .info-item { padding: 0.9rem; }
+          .info-label { font-size: 0.68rem; }
+          .info-val { font-size: 0.95rem; }
+          .btn-row { gap: 0.625rem; }
+          .btn-outline, .btn-primary-lg { padding: 0.65rem 1rem; font-size: 0.8rem; }
+          table { font-size: 0.8rem; }
+          th { padding: 0.7rem 0.75rem; font-size: 0.65rem; }
+          td { padding: 0.75rem 0.75rem; font-size: 0.8rem; }
+          .status-badge { font-size: 0.65rem; padding: 2px 8px; }
+          .btn-detail { padding: 4px 10px; font-size: 0.72rem; }
+        }
+        @media (max-width: 640px) {
+          .pg { padding: 1rem; gap: 0.875rem; }
+          .topbar { flex-direction: column; align-items: flex-start; }
+          .btn-back { font-size: 0.8rem; margin-bottom: 0.5rem; }
+          .emp-header { padding: 1.25rem; width: 100%; }
+          .emp-avatar { width: 44px; height: 44px; font-size: 1.2rem; }
+          .emp-nama { font-size: 0.95rem; }
+          .emp-meta { font-size: 0.72rem; }
+          .badge-role { font-size: 0.65rem; padding: 2px 8px; }
+          .tabs { padding: 0.25rem; }
+          .tab-btn { padding: 0.5rem 0.9rem; font-size: 0.75rem; }
+          .content { padding: 1rem; }
+          .tab-desc { font-size: 0.8rem; margin-bottom: 1rem; }
+          .info-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+          .info-item { padding: 0.8rem; }
+          .info-label { font-size: 0.65rem; }
+          .info-val { font-size: 0.9rem; }
+          .btn-row { flex-direction: column; gap: 0.5rem; }
+          .btn-outline, .btn-primary-lg { width: 100%; justify-content: center; padding: 0.6rem; font-size: 0.75rem; }
+          .rw-toolbar { flex-direction: column; align-items: flex-start; gap: 0.5rem; }
+          .rw-toolbar button { width: 100%; }
+          .table-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+          table { font-size: 0.75rem; }
+          th { padding: 0.6rem 0.6rem; font-size: 0.6rem; }
+          td { padding: 0.65rem 0.6rem; font-size: 0.75rem; }
+          .status-badge { font-size: 0.6rem; padding: 1px 6px; }
+          .btn-detail { padding: 3px 8px; font-size: 0.65rem; }
+          .slip-row-card { padding: 0.9rem; }
+          .slip-row-actions { flex-direction: column; gap: 3px; }
+          .form-grid { grid-template-columns: 1fr; gap: 0.75rem; }
+          .form-field input, .form-field select { padding: 0.6rem 0.8rem; font-size: 0.8rem; }
+        }
+        @media (max-width: 480px) {
+          .pg { padding: 0.75rem; }
+          .emp-header { padding: 1rem; }
+          .emp-avatar { width: 40px; height: 40px; font-size: 1rem; }
+          .emp-nama { font-size: 0.9rem; }
+          .emp-meta { font-size: 0.68rem; gap: 4px; }
+          .tab-btn { padding: 0.45rem 0.8rem; font-size: 0.7rem; }
+          .content { padding: 0.85rem; }
+          .info-grid { gap: 0.625rem; }
+          .info-item { padding: 0.7rem; }
+          .info-label { font-size: 0.6rem; letter-spacing: 0.3px; }
+          .info-val { font-size: 0.85rem; }
+          th { padding: 0.5rem; font-size: 0.55rem; }
+          td { padding: 0.55rem 0.5rem; font-size: 0.7rem; }
+          .btn-detail { padding: 2px 6px; font-size: 0.6rem; }
+        }
+
+        @media (max-width: 768px) {          .pg { padding:1rem; }
           .emp-stats { display:none; }
           .emp-header { flex-direction:column;align-items:flex-start; }
         }

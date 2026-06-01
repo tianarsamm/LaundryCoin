@@ -456,6 +456,115 @@ function LoginForm() {
           animation: riseIn 0.45s 0.2s cubic-bezier(0.22,1,0.36,1) both;
         }
 
+        @media (max-width: 768px) {
+          .card { 
+            padding: 2.25rem 2rem 1.95rem;
+            border-radius: 20px;
+            gap: 1.4rem;
+            max-width: 100%;
+          }
+          .logo-row { gap: 10px; }
+          .logo-mark { width: 40px; height: 40px; }
+          .logo-name { font-size: 0.95rem; }
+          .logo-tag { font-size: 0.55rem; letter-spacing: 2px; }
+          .heading h1 { font-size: 1.5rem; margin-bottom: 4px; }
+          .heading p { font-size: 0.8rem; }
+          .error-box { font-size: 0.78rem; padding: 10px 12px; }
+          .form { gap: 1rem; }
+          .field label { font-size: 0.72rem; }
+          .input-wrap input { padding: 0.75rem 1rem 0.75rem 2.4rem; font-size: 0.88rem; border-radius: 10px; }
+          .field-icon { left: 12px; }
+          .eye-btn { right: 10px; }
+          .btn-submit { padding: 0.8rem; border-radius: 11px; }
+          .btn-content { font-size: 0.85rem; }
+          .spinner { width: 13px; height: 13px; border-width: 1.5px; }
+          .footer-note { font-size: 0.75rem; }
+        }
+        @media (max-width: 640px) {
+          .login-page { padding: 1rem; }
+          .card { 
+            padding: 2rem 1.75rem 1.75rem;
+            border-radius: 18px;
+            gap: 1.2rem;
+            width: 100%;
+          }
+          .logo-row { gap: 8px; }
+          .logo-mark { width: 36px; height: 36px; }
+          .logo-name { font-size: 0.9rem; }
+          .logo-tag { font-size: 0.52rem; }
+          .heading h1 { font-size: clamp(1.3rem, 1.8vw, 1.5rem); margin-bottom: 3px; }
+          .heading p { font-size: 0.77rem; }
+          .error-box { 
+            font-size: 0.75rem; 
+            padding: 10px 12px;
+            gap: 7px;
+            border-radius: 8px;
+          }
+          .form { gap: 0.9rem; margin-top: 0.1rem; }
+          .field { gap: 5px; }
+          .field label { font-size: 0.7rem; letter-spacing: 0.3px; }
+          .input-wrap input { 
+            padding: 0.7rem 0.9rem 0.7rem 2.3rem; 
+            font-size: 0.85rem; 
+            border-radius: 10px;
+          }
+          .field-icon { left: 11px; width: 13px; height: 13px; }
+          .eye-btn { right: 9px; padding: 3px; }
+          .btn-submit { 
+            padding: 0.75rem;
+            border-radius: 10px;
+            margin-top: 0.2rem;
+          }
+          .btn-content { font-size: 0.82rem; gap: 6px; }
+          .spinner { width: 12px; height: 12px; border-width: 1.5px; }
+          .footer-note { font-size: 0.72rem; margin-top: 0.25rem; }
+          .g1 { width: 400px; height: 400px; top: -150px; right: -100px; }
+          .g2 { width: 350px; height: 350px; bottom: -100px; left: -80px; }
+          .g3 { width: 250px; height: 250px; }
+        }
+        @media (max-width: 480px) {
+          .login-page { padding: 0.75rem; }
+          .card { 
+            padding: 1.75rem 1.5rem 1.5rem;
+            border-radius: 16px;
+            gap: 1rem;
+          }
+          .logo-row { gap: 7px; }
+          .logo-mark { width: 34px; height: 34px; border-radius: 10px; }
+          .logo-name { font-size: 0.85rem; }
+          .logo-tag { font-size: 0.5rem; letter-spacing: 1.5px; }
+          .heading h1 { font-size: 1.3rem; }
+          .heading p { font-size: 0.75rem; }
+          .error-box { 
+            font-size: 0.72rem; 
+            padding: 9px 11px;
+            gap: 6px;
+          }
+          .form { gap: 0.85rem; }
+          .field label { font-size: 0.68rem; }
+          .input-wrap input { 
+            padding: 0.65rem 0.85rem 0.65rem 2.2rem;
+            font-size: 0.82rem;
+          }
+          .field-icon { left: 10px; width: 12px; height: 12px; }
+          .eye-btn { right: 8px; padding: 2px; }
+          .btn-submit { padding: 0.7rem; }
+          .btn-content { font-size: 0.8rem; gap: 5px; }
+          .spinner { width: 11px; height: 11px; }
+          .footer-note { font-size: 0.7rem; }
+          .g1 { width: 300px; height: 300px; }
+          .g2 { width: 250px; height: 250px; }
+          .g3 { width: 200px; height: 200px; }
+        }
+        @media (max-width: 400px) {
+          .card { padding: 1.5rem 1.25rem; border-radius: 14px; gap: 0.9rem; }
+          .heading h1 { font-size: 1.2rem; }
+          .logo-mark { width: 32px; height: 32px; }
+          .input-wrap input { padding: 0.6rem 0.8rem 0.6rem 2.1rem; font-size: 0.8rem; }
+          .btn-submit { padding: 0.65rem; }
+          .btn-content { font-size: 0.78rem; }
+        }
+
         @media (max-width: 460px) {
           .card { padding: 2.25rem 1.5rem 2rem; border-radius: 20px; }
           .heading h1 { font-size: 1.45rem; }

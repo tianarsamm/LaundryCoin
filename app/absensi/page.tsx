@@ -118,6 +118,47 @@ export default function AbsensiPage() {
         .abs-btn-outline:disabled { opacity:.35;cursor:not-allowed }
         .abs-btn-dark { background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.1);color:#cbd5e1;width:100%;padding:13px;border-radius:14px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:inherit }
         .abs-btn-dark:hover { background:rgba(255,255,255,0.11) }
+
+        @media (max-width: 768px) {
+          div { max-width: 100%; padding: 20px 14px 40px; gap: 14px; }
+          h1 { font-size: 23px; }
+          p { font-size: 13px; }
+        }
+
+        @media (max-width: 640px) {
+          div { max-width: 100%; padding: 18px 12px 36px; gap: 12px; }
+          h1 { font-size: 20px; margin-bottom: 2px; }
+          p { font-size: 12px; }
+          .abs-btn-outline, .abs-btn-dark {
+            padding: 11px;
+            border-radius: 12px;
+            font-size: 13px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          div { padding: 16px 12px 32px; gap: 10px; }
+          h1 { font-size: 18px; }
+          p { font-size: 11px; }
+          .abs-btn-outline, .abs-btn-dark {
+            padding: 10px;
+            border-radius: 11px;
+            font-size: 12px;
+          }
+          button {
+            font-size: 13px;
+          }
+        }
+
+        @media (max-width: 400px) {
+          div { padding: 14px 10px 28px; gap: 8px; }
+          h1 { font-size: 16px; }
+          p { font-size: 10px; }
+          .abs-btn-outline, .abs-btn-dark {
+            padding: 9px;
+            font-size: 11px;
+          }
+        }
       `}</style>
 
       {/* Header */}

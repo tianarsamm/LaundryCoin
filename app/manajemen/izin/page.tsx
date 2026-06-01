@@ -454,6 +454,88 @@ export default function AdminIzinPage() {
         .btn-review{padding:5px 12px;background:rgba(99,102,241,0.12);border:1px solid rgba(99,102,241,0.25);border-radius:7px;color:#a5b4fc;font-size:0.78rem;font-weight:700;cursor:pointer;transition:all 0.15s;white-space:nowrap}
         .btn-review:hover{background:rgba(99,102,241,0.2);color:#c7d2fe}
         .item-date{font-size:0.7rem;color:#334155}
+        
+        @media (max-width: 768px) {
+          .pg { padding: 1.25rem; gap: 1rem; }
+          .header { flex-direction: column; }
+          .header h1 { font-size: 1.35rem; }
+          .header p { font-size: 0.8rem; }
+          .pending-badge { font-size: 0.78rem; padding: 0.45rem 0.9rem; }
+          .stats { grid-template-columns: repeat(2, 1fr); gap: 0.625rem; }
+          .stat-card { padding: 0.9rem; }
+          .stat-num { font-size: 1.2rem; }
+          .stat-lbl { font-size: 0.65rem; }
+          .tabs { overflow-x: auto; gap: 3px; }
+          .tab { padding: 5px 14px; font-size: 0.78rem; }
+          .item { padding: 0.95rem 1.1rem; gap: 10px; }
+          .item-icon { width: 32px; height: 32px; font-size: 1rem; }
+          .item-nama { font-size: 0.85rem; }
+          .role-pill { font-size: 0.65rem; padding: 1px 6px; }
+          .item-type-pill { font-size: 0.65rem; }
+          .item-dates { font-size: 0.75rem; }
+          .dur-pill { font-size: 0.65rem; padding: 1px 6px; }
+          .item-ket { font-size: 0.75rem; }
+          .admin-note { font-size: 0.73rem; padding: 4px 8px; }
+          .btn-review { font-size: 0.73rem; padding: 4px 10px; }
+          .item-date { font-size: 0.65rem; }
+          .toast { bottom: 1.5rem; right: 1.5rem; font-size: 0.8rem; }
+        }
+
+        @media (max-width: 640px) {
+          .pg { padding: 1rem; gap: 0.875rem; padding-bottom: 3.5rem; }
+          .header h1 { font-size: clamp(1.2rem, 1.8vw, 1.5rem); }
+          .header p { font-size: 0.77rem; }
+          .pending-badge { font-size: 0.75rem; padding: 0.4rem 0.85rem; }
+          .stats { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
+          .stat-card { padding: 0.8rem; }
+          .stat-num { font-size: 1.1rem; }
+          .stat-lbl { font-size: 0.6rem; letter-spacing: 0.3px; }
+          .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; padding: 3px; }
+          .tab { padding: 4px 12px; font-size: 0.75rem; }
+          .item { padding: 0.8rem 0.9rem; }
+          .item-icon { width: 30px; height: 30px; margin-top: 1px; }
+          .item-nama { font-size: 0.8rem; }
+          .item-top { gap: 5px; }
+          .role-pill { font-size: 0.62rem; padding: 0px 5px; }
+          .item-type-pill { font-size: 0.62rem; }
+          .item-dates { font-size: 0.72rem; gap: 5px; }
+          .dur-pill { font-size: 0.6rem; padding: 0px 5px; }
+          .item-ket { font-size: 0.72rem; }
+          .item-right { gap: 5px; }
+          .admin-note { font-size: 0.7rem; padding: 3px 7px; }
+          .btn-review { font-size: 0.7rem; padding: 3px 8px; }
+          .status-badge { font-size: 0.65rem; padding: 2px 8px; }
+          .item-date { font-size: 0.62rem; }
+          .toast { bottom: 1.25rem; right: 1rem; font-size: 0.75rem; padding: 0.6rem 1rem; }
+        }
+
+        @media (max-width: 480px) {
+          .pg { padding: 0.75rem; }
+          .header h1 { font-size: 1.3rem; }
+          .stats { grid-template-columns: 1fr; gap: 0.5rem; }
+          .stat-card { padding: 0.75rem; }
+          .stat-num { font-size: 1rem; }
+          .stat-lbl { font-size: 0.58rem; }
+          .tab { padding: 3px 10px; font-size: 0.7rem; }
+          .item { padding: 0.7rem 0.8rem; gap: 8px; }
+          .item-icon { width: 28px; height: 28px; font-size: 0.95rem; }
+          .item-nama { font-size: 0.75rem; }
+          .role-pill { font-size: 0.58rem; }
+          .item-dates { font-size: 0.68rem; }
+          .dur-pill { font-size: 0.55rem; }
+          .item-ket { font-size: 0.68rem; }
+          .btn-review { font-size: 0.65rem; padding: 2px 6px; }
+          .toast { bottom: 1rem; right: 0.75rem; }
+        }
+
+        @media (max-width: 360px) {
+          .pg { padding: 0.5rem; }
+          .header h1 { font-size: 1.2rem; }
+          .stats { grid-template-columns: 1fr; }
+          .item { padding: 0.6rem 0.7rem; }
+          .item-icon { width: 26px; height: 26px; }
+        }
+        
         @media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}.tabs{width:100%;overflow-x:auto}}
       `}</style>
     </div>
