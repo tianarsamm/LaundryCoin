@@ -447,7 +447,7 @@ export default function DashboardPage() {
 
         /* ✅ FIX: chart card dapat padding bawah ekstra agar axis label tidak keluar */
         .chart-card {
-          padding-bottom: 32px;
+          padding-bottom: 40px;
         }
 
         .card-header {
@@ -476,13 +476,14 @@ export default function DashboardPage() {
         .chart-card__wrapper {
           position: relative;
           width: 100%;
-          overflow: hidden;
+          overflow: visible;
+          padding-bottom: 20px;
         }
 
         /* ✅ FIX: height lebih besar dari sebelumnya agar axis tidak terpotong */
         .chart-card__body {
           position: relative;
-          height: 320px;
+          height: 340px;
           width: 100%;
         }
 
@@ -606,10 +607,10 @@ export default function DashboardPage() {
           .chart-card, .recent-card { padding: 18px 16px; }
 
           /* ✅ FIX: padding bawah ekstra di tablet */
-          .chart-card { padding-bottom: 36px; }
+          .chart-card { padding-bottom: 44px; }
 
           /* ✅ FIX: height lebih tinggi agar axis label tidak terpotong */
-          .chart-card__body { height: 280px; }
+          .chart-card__body { height: 300px; }
           .card-header h2 { font-size: 1rem; }
         }
 
@@ -637,10 +638,10 @@ export default function DashboardPage() {
           .chart-card, .recent-card { padding: 14px; }
 
           /* ✅ FIX: cukup ruang untuk axis label di mobile */
-          .chart-card { padding-bottom: 40px; }
+          .chart-card { padding-bottom: 48px; }
 
           /* ✅ FIX: height naik dari 200px → 240px agar axis tidak terpotong */
-          .chart-card__body { height: 240px; }
+          .chart-card__body { height: 260px; }
           .card-header { margin-bottom: 16px; gap: 8px; }
           .card-header h2 { font-size: 0.9rem; }
           .recent-list  { gap: 6px; }
@@ -677,10 +678,10 @@ export default function DashboardPage() {
           .chart-card, .recent-card { padding: 12px; }
 
           /* ✅ FIX: padding bawah extra di hp kecil */
-          .chart-card { padding-bottom: 44px; }
+          .chart-card { padding-bottom: 52px; }
 
           /* ✅ FIX: height naik dari 180px → 220px */
-          .chart-card__body { height: 220px; }
+          .chart-card__body { height: 240px; }
           .card-header { margin-bottom: 12px; }
           .card-header__dot { width: 6px; height: 6px; }
           .recent-item { padding: 8px 10px; }
