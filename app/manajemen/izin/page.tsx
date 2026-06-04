@@ -1,12 +1,13 @@
 "use client";
 
+import { sendNotification } from "@/lib/notifications/sendNotification";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 
 // ─── Types ────────────────────────────────────────────────────────
-type LeaveType   = "sakit" | "izin";
+type LeaveType = "sakit" | "izin";
 type LeaveStatus = "pending" | "approved" | "rejected";
-type FilterTab   = "pending" | "approved" | "rejected" | "all";
+type FilterTab = "pending" | "approved" | "rejected" | "all";
 
 interface LeaveRequest {
   id: string;
@@ -39,20 +40,20 @@ function formatTgl(iso: string) {
 }
 
 const STATUS_CFG: Record<LeaveStatus, { label: string; color: string; bg: string; border: string }> = {
-  pending:  { label: "Menunggu",  color: "#fbbf24", bg: "rgba(251,191,36,0.1)",  border: "rgba(251,191,36,0.25)"  },
-  approved: { label: "Disetujui", color: "#4ade80", bg: "rgba(74,222,128,0.1)",  border: "rgba(74,222,128,0.2)"   },
-  rejected: { label: "Ditolak",   color: "#f87171", bg: "rgba(248,113,113,0.1)", border: "rgba(248,113,113,0.2)"  },
+  pending: { label: "Menunggu", color: "#fbbf24", bg: "rgba(251,191,36,0.1)", border: "rgba(251,191,36,0.25)" },
+  approved: { label: "Disetujui", color: "#4ade80", bg: "rgba(74,222,128,0.1)", border: "rgba(74,222,128,0.2)" },
+  rejected: { label: "Ditolak", color: "#f87171", bg: "rgba(248,113,113,0.1)", border: "rgba(248,113,113,0.2)" },
 };
 
 const TYPE_CFG: Record<LeaveType, { label: string; icon: string }> = {
   sakit: { label: "Sakit", icon: "🤒" },
-  izin:  { label: "Izin",  icon: "📋" },
+  izin: { label: "Izin", icon: "📋" },
 };
 
 // ─── Icons ────────────────────────────────────────────────────────
-const ICheck = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>;
-const IXIcon = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
-const IX     = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
+const ICheck = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>;
+const IXIcon = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>;
+const IX = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>;
 
 // ─── Modal Review ─────────────────────────────────────────────────
 function ModalReview({
@@ -62,12 +63,12 @@ function ModalReview({
   onClose: () => void;
   onDone: () => void;
 }) {
-  const [action,  setAction]  = useState<"approved" | "rejected" | null>(null);
+  const [action, setAction] = useState<"approved" | "rejected" | null>(null);
   const [catatan, setCatatan] = useState("");
   const [loading, setLoading] = useState(false);
-  const [err,     setErr]     = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
-  const hari     = hitungHari(item.tanggal_mulai, item.tanggal_selesai);
+  const hari = hitungHari(item.tanggal_mulai, item.tanggal_selesai);
   const potongan = hari * 75_000;
 
   const handleSubmit = async () => {
@@ -78,13 +79,23 @@ function ModalReview({
       const { error } = await supabase
         .from("leave_requests")
         .update({
-          leave_status:  action,
-          reviewed_by:   user?.id,
-          reviewed_at:   new Date().toISOString(),
+          leave_status: action,
+          reviewed_by: user?.id,
+          reviewed_at: new Date().toISOString(),
           catatan_admin: catatan.trim() || null,
         })
         .eq("id", item.id);
       if (error) throw error;
+
+      // Kirim notifikasi ke user yang mengajukan
+      await sendNotification({
+        title: action === "approved" ? "Pengajuan Disetujui ✓" : "Pengajuan Ditolak",
+        body: action === "approved"
+          ? `Pengajuan ${TYPE_CFG[item.leave_type].label} Anda telah disetujui.`
+          : `Pengajuan ${TYPE_CFG[item.leave_type].label} Anda ditolak.${catatan ? ` Catatan: ${catatan}` : ""}`,
+        userId: item.user_id,
+      });
+
       onDone();
       onClose();
     } catch (e: any) {
@@ -232,11 +243,11 @@ function ModalReview({
 
 // ─── Main Admin Page ──────────────────────────────────────────────
 export default function AdminIzinPage() {
-  const [list,    setList]    = useState<LeaveRequest[]>([]);
+  const [list, setList] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab,     setTab]     = useState<FilterTab>("pending");
-  const [review,  setReview]  = useState<LeaveRequest | null>(null);
-  const [toast,   setToast]   = useState<string | null>(null);
+  const [tab, setTab] = useState<FilterTab>("pending");
+  const [review, setReview] = useState<LeaveRequest | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
   const fetchList = useCallback(async () => {
     setLoading(true);
@@ -256,9 +267,9 @@ export default function AdminIzinPage() {
 
       const mapped = (data ?? []).map((d: any) => ({
         ...d,
-        nama:  d.users?.nama,
+        nama: d.users?.nama,
         email: d.users?.email,
-        role:  d.users?.role,
+        role: d.users?.role,
       })) as LeaveRequest[];
 
       setList(mapped);
@@ -278,8 +289,8 @@ export default function AdminIzinPage() {
   const filtered = tab === "all" ? list : list.filter(l => l.leave_status === tab);
 
   const counts = {
-    all:      list.length,
-    pending:  list.filter(l => l.leave_status === "pending").length,
+    all: list.length,
+    pending: list.filter(l => l.leave_status === "pending").length,
     approved: list.filter(l => l.leave_status === "approved").length,
     rejected: list.filter(l => l.leave_status === "rejected").length,
   };
@@ -334,7 +345,7 @@ export default function AdminIzinPage() {
 
       {/* Tabs */}
       <div className="tabs">
-        {(["pending","all","approved","rejected"] as FilterTab[]).map(t => (
+        {(["pending", "all", "approved", "rejected"] as FilterTab[]).map(t => (
           <button
             key={t}
             className={`tab ${tab === t ? "tab-active" : ""}`}
@@ -362,10 +373,10 @@ export default function AdminIzinPage() {
         )}
 
         {!loading && filtered.map((item, i) => {
-          const hari     = hitungHari(item.tanggal_mulai, item.tanggal_selesai);
+          const hari = hitungHari(item.tanggal_mulai, item.tanggal_selesai);
           const potongan = hari * 75_000;
-          const st       = STATUS_CFG[item.leave_status];
-          const tp       = TYPE_CFG[item.leave_type];
+          const st = STATUS_CFG[item.leave_status];
+          const tp = TYPE_CFG[item.leave_type];
 
           return (
             <div key={item.id} className={`item ${i < filtered.length - 1 ? "item-border" : ""}`}>
@@ -400,7 +411,7 @@ export default function AdminIzinPage() {
                     Review →
                   </button>
                 )}
-                <span className="item-date">{new Date(item.created_at).toLocaleDateString("id-ID", { day:"numeric", month:"short" })}</span>
+                <span className="item-date">{new Date(item.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}</span>
               </div>
             </div>
           );

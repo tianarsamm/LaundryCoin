@@ -1,10 +1,11 @@
 "use client";
 
+import { sendNotification } from "@/lib/notifications/sendNotification";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 
 // ─── Types ────────────────────────────────────────────────────────
-type LeaveType   = "sakit" | "izin";
+type LeaveType = "sakit" | "izin";
 type LeaveStatus = "pending" | "approved" | "rejected";
 
 interface LeaveRequest {
@@ -34,37 +35,37 @@ function formatTgl(iso: string) {
 }
 
 const STATUS_CFG: Record<LeaveStatus, { label: string; color: string; bg: string; border: string; dot: string }> = {
-  pending:  { label: "Menunggu",  color: "#fbbf24", bg: "rgba(251,191,36,0.1)",  border: "rgba(251,191,36,0.25)",  dot: "#fbbf24" },
-  approved: { label: "Disetujui", color: "#4ade80", bg: "rgba(74,222,128,0.1)",  border: "rgba(74,222,128,0.2)",   dot: "#4ade80" },
-  rejected: { label: "Ditolak",   color: "#f87171", bg: "rgba(248,113,113,0.1)", border: "rgba(248,113,113,0.2)",  dot: "#f87171" },
+  pending: { label: "Menunggu", color: "#fbbf24", bg: "rgba(251,191,36,0.1)", border: "rgba(251,191,36,0.25)", dot: "#fbbf24" },
+  approved: { label: "Disetujui", color: "#4ade80", bg: "rgba(74,222,128,0.1)", border: "rgba(74,222,128,0.2)", dot: "#4ade80" },
+  rejected: { label: "Ditolak", color: "#f87171", bg: "rgba(248,113,113,0.1)", border: "rgba(248,113,113,0.2)", dot: "#f87171" },
 };
 
 const TYPE_CFG: Record<LeaveType, { label: string; icon: string; color: string }> = {
-  sakit: { label: "Sakit",       icon: "🤒", color: "#f87171" },
-  izin:  { label: "Izin",        icon: "📋", color: "#60a5fa" },
+  sakit: { label: "Sakit", icon: "🤒", color: "#f87171" },
+  izin: { label: "Izin", icon: "📋", color: "#60a5fa" },
 };
 
 // ─── Icons ────────────────────────────────────────────────────────
-const IPlus = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round"/></svg>;
-const IX    = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>;
-const ICal  = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.8"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/></svg>;
+const IPlus = () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" /></svg>;
+const IX = () => <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /></svg>;
+const ICal = () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.8" /><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>;
 
 // ─── Modal Form Submit ────────────────────────────────────────────
 function ModalSubmit({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
   const today = new Date().toISOString().slice(0, 10);
-  const [type,    setType]    = useState<LeaveType>("sakit");
-  const [mulai,   setMulai]   = useState(today);
+  const [type, setType] = useState<LeaveType>("sakit");
+  const [mulai, setMulai] = useState(today);
   const [selesai, setSelesai] = useState(today);
-  const [ket,     setKet]     = useState("");
+  const [ket, setKet] = useState("");
   const [loading, setLoading] = useState(false);
-  const [err,     setErr]     = useState<string | null>(null);
+  const [err, setErr] = useState<string | null>(null);
 
-  const hari     = hitungHari(mulai, selesai);
+  const hari = hitungHari(mulai, selesai);
   const potongan = hari * 75_000;
 
   const handleSubmit = async () => {
     if (!ket.trim()) { setErr("Keterangan wajib diisi."); return; }
-    if (hari <= 0)   { setErr("Tanggal selesai harus setelah tanggal mulai."); return; }
+    if (hari <= 0) { setErr("Tanggal selesai harus setelah tanggal mulai."); return; }
     setLoading(true); setErr(null);
     try {
       const { data: { user } } = await supabase.auth.getUser();
@@ -77,6 +78,13 @@ function ModalSubmit({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
         keterangan: ket.trim(),
       });
       if (error) throw error;
+
+      // Kirim notifikasi ke super admin
+      await sendNotification({
+        title: `Pengajuan ${type === "sakit" ? "Sakit" : "Izin"} Baru`,
+        body: `Karyawan mengajukan ${type} selama ${hari} hari (${mulai} s/d ${selesai})`,
+      });
+
       onSuccess();
       onClose();
     } catch (e: any) {
@@ -107,7 +115,7 @@ function ModalSubmit({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
         <div className="field">
           <label>Jenis Pengajuan</label>
           <div className="type-group">
-            {(["sakit","izin"] as LeaveType[]).map(t => (
+            {(["sakit", "izin"] as LeaveType[]).map(t => (
               <button
                 key={t}
                 className={`type-btn ${type === t ? "type-active" : ""}`}
@@ -273,9 +281,9 @@ function ModalSubmit({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
 
 // ─── Main Page ────────────────────────────────────────────────────
 export default function IzinSakitPage() {
-  const [list,    setList]    = useState<LeaveRequest[]>([]);
+  const [list, setList] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
-  const [modal,   setModal]   = useState(false);
+  const [modal, setModal] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
 
   const fetchList = useCallback(async () => {
@@ -304,7 +312,7 @@ export default function IzinSakitPage() {
     setTimeout(() => setSuccess(null), 5000);
   };
 
-  const pending  = list.filter(l => l.leave_status === "pending").length;
+  const pending = list.filter(l => l.leave_status === "pending").length;
   const approved = list.filter(l => l.leave_status === "approved").length;
 
   return (
@@ -368,10 +376,10 @@ export default function IzinSakitPage() {
         )}
 
         {!loading && list.map((item, i) => {
-          const hari     = hitungHari(item.tanggal_mulai, item.tanggal_selesai);
+          const hari = hitungHari(item.tanggal_mulai, item.tanggal_selesai);
           const potongan = hari * 75_000;
-          const st       = STATUS_CFG[item.leave_status];
-          const tp       = TYPE_CFG[item.leave_type];
+          const st = STATUS_CFG[item.leave_status];
+          const tp = TYPE_CFG[item.leave_type];
 
           return (
             <div key={item.id} className={`item ${i < list.length - 1 ? "item-border" : ""}`}>
@@ -408,7 +416,7 @@ export default function IzinSakitPage() {
                   {item.leave_status === "approved" ? `− ${IDR(potongan)}` : IDR(potongan)}
                 </div>
                 <div className="item-date-sub">
-                  {new Date(item.created_at).toLocaleDateString("id-ID", { day:"numeric", month:"short" })}
+                  {new Date(item.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" })}
                 </div>
               </div>
             </div>
