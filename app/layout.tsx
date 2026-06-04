@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Sora, DM_Sans } from "next/font/google";
 import Navbar from "@/components/Navbar";
-import ServiceWorkerRegister from "@/components/ServiceWorkerRegister"; // ← tambah ini
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import NotificationProvider from "@/components/NotificationProvider";
 import "./globals.css";
 
 const sora = Sora({
@@ -36,7 +37,8 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${sora.variable} ${dmSans.variable}`}>
       <body className="layout">
-        <ServiceWorkerRegister />  {/* ← tambah ini */}
+        <ServiceWorkerRegister />
+        <NotificationProvider />
         <Navbar />
         <main className="layout__main">
           {children}
