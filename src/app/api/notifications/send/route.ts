@@ -94,14 +94,22 @@ export async function POST(request: NextRequest) {
 
       // Send to specific user
       try {
-        const response =
-          await messaging.sendEachForMulticast({
-            tokens,
-            notification: {
-              title,
-              body,
-            },
-          });
+        const response = await messaging.sendEachForMulticast({
+          tokens,
+          notification: { title, body },
+        });
+
+        // LOG DETAIL
+        console.log("[FCM] Tokens dikirim:", tokens);
+        console.log("[FCM] successCount:", response.successCount);
+        console.log("[FCM] failureCount:", response.failureCount);
+        response.responses.forEach((r, i) => {
+          if (!r.success) {
+            console.error(`[FCM] Token[${i}] GAGAL — code: ${r.error?.code} | msg: ${r.error?.message}`);
+          } else {
+            console.log(`[FCM] Token[${i}] OK — messageId: ${r.messageId}`);
+          }
+        });
 
         return NextResponse.json(
           {
@@ -157,14 +165,22 @@ export async function POST(request: NextRequest) {
 
       // Send to all super admins
       try {
-        const response =
-          await messaging.sendEachForMulticast({
-            tokens,
-            notification: {
-              title,
-              body,
-            },
-          });
+        const response = await messaging.sendEachForMulticast({
+          tokens,
+          notification: { title, body },
+        });
+
+        // LOG DETAIL
+        console.log("[FCM] Tokens dikirim:", tokens);
+        console.log("[FCM] successCount:", response.successCount);
+        console.log("[FCM] failureCount:", response.failureCount);
+        response.responses.forEach((r, i) => {
+          if (!r.success) {
+            console.error(`[FCM] Token[${i}] GAGAL — code: ${r.error?.code} | msg: ${r.error?.message}`);
+          } else {
+            console.log(`[FCM] Token[${i}] OK — messageId: ${r.messageId}`);
+          }
+        });
 
         return NextResponse.json(
           {
