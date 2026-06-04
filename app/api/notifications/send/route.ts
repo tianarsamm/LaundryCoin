@@ -130,21 +130,20 @@ export async function POST(req: NextRequest) {
         webpush: {
           notification: {
             // UI Elements
-            title, // Redundant tapi ensure consistency
+            title,
             body: messageBody,
             icon: "/logo/Laundry2.png",
             badge: "/logo/Laundry2.png",
+            image: "/logo/Laundry2.png",
             
-            // Behavior
-            tag: "laundry-notification", // Unique ID - hanya 1 notifikasi per tag
-            renotify: true, // Notifikasi ulang jika ada update
-            requireInteraction: true, // Jangan auto-dismiss
+            // Critical for Android notification panel visibility
+            tag: "laundry-notification",
+            renotify: true,
+            requireInteraction: true,
             
             // Visual (Android)
             vibrate: [200, 100, 200],
             color: "#6366f1",
-            
-            // Mobile optimized
             silent: false,
             dir: "ltr",
           },
@@ -152,23 +151,30 @@ export async function POST(req: NextRequest) {
             link: "/manajemen/izin",
           },
           headers: {
-            "TTL": "3600", // Delivery window: 1 hour
+            "TTL": "3600",
+            "Urgency": "high", // Important priority
           },
         },
-        // Android-specific config
+        // Android-specific configuration
         android: {
+          priority: "high",
           notification: {
             title,
             body: messageBody,
-            icon: "notification_icon", // Reference to drawable in Android
+            icon: "ic_launcher", // Reference to app icon
             color: "#6366f1",
             sound: "default",
             channelId: "laundry-notifications",
-            priority: "high", // Important notifications
+            clickAction: "/manajemen/izin",
+            priority: "high",
             tag: "laundry-notification",
+            vibrate_timings_millis: [200, 100, 200],
+            default_vibrate_timings: true,
+            notification_priority: "PRIORITY_MAX",
           },
-          ttl: 3600,
-          restrictedPackageName: undefined, // Allow all packages
+          ttl: {
+            seconds: 3600,
+          },
         },
       });
 

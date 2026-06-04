@@ -23,6 +23,12 @@ const dmSans = DM_Sans({
 export const metadata: Metadata = {
   title: "Laundry Coin — Sistem Laundry",
   description: "Sistem Manajemen Usaha Laundry",
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Laundry Coin",
+  },
   icons: {
     icon: "/logo/Laundry2.png",
     shortcut: "/logo/Laundry2.png",
