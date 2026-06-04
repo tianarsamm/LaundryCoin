@@ -28,8 +28,8 @@ messaging.onBackgroundMessage((payload) => {
   const notificationTitle = payload.notification?.title || "Notifikasi";
   const notificationOptions = {
     body: payload.notification?.body || "",
-    icon: "/icon-192.png",
-    badge: "/badge-72.png",
+    icon: "/logo/Laundry2.png",
+    badge: "/logo/Laundry2.png",
     tag: "firebase-notification",
     renotify: true,
     data: payload.data || {},
