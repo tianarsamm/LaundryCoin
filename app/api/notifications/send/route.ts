@@ -168,8 +168,7 @@ export async function POST(req: NextRequest) {
             clickAction: "/manajemen/izin",
             priority: "high",
             tag: "laundry-notification",
-            vibrate_timings_millis: [200, 100, 200],
-            default_vibrate_timings: true,
+            vibrateTimingsMillis: [200, 100, 200],
             notification_priority: "PRIORITY_MAX",
           },
           ttl: {
