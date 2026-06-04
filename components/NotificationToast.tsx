@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
 
 interface NotificationMessage {
   id: string;
@@ -10,6 +9,14 @@ interface NotificationMessage {
   timestamp: Date;
   type?: 'info' | 'success' | 'warning' | 'error';
 }
+
+// Close icon SVG
+const CloseIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+    <line x1="18" y1="6" x2="6" y2="18" />
+    <line x1="6" y1="6" x2="18" y2="18" />
+  </svg>
+);
 
 export function NotificationToast() {
   const [notifications, setNotifications] = useState<NotificationMessage[]>([]);
@@ -79,7 +86,7 @@ export function NotificationToast() {
               className="flex-shrink-0 hover:opacity-70 transition-opacity"
               aria-label="Close notification"
             >
-              <X size={18} />
+              <CloseIcon />
             </button>
           </div>
         </div>
