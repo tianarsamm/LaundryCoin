@@ -95,7 +95,7 @@ export async function POST(request: NextRequest) {
       // Send to specific user
       try {
         const response =
-          await messaging.sendEachForMulticast({
+          await messaging.sendMulticast({
             tokens,
             notification: {
               title,
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
       // Send to all super admins
       try {
         const response =
-          await messaging.sendEachForMulticast({
+          await messaging.sendMulticast({
             tokens,
             notification: {
               title,

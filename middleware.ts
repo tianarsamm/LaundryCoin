@@ -7,7 +7,7 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
 // Route yang tidak perlu login
-const PUBLIC_ROUTES = ["/login"];
+const PUBLIC_ROUTES = ["/login", "/setup"];
 
 // Route yang hanya boleh diakses super admin
 // (pengecekan role tetap di page-nya, middleware hanya cek session)
@@ -18,8 +18,8 @@ const PROTECTED_ROUTES = [
   "/laporan",
   "/absensi",
   "/jadwal",
-  "/manajemen",
-  "/setup",
+  "/manajemen-karyawan",
+  "/kelola-absensi",
 ];
 
 export async function middleware(request: NextRequest) {

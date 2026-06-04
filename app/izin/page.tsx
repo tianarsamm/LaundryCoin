@@ -161,7 +161,7 @@ function ModalSubmit({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
 
         <div className="mfoot">
           <button className="btn-sec" onClick={onClose}>Batal</button>
-          <button className="btn-pri" onClick={handleSubmit} disabled={loading}>
+          <button className="btn-sec" onClick={handleSubmit} disabled={loading}>
             {loading ? "Mengirim..." : "Kirim Pengajuan"}
           </button>
         </div>
