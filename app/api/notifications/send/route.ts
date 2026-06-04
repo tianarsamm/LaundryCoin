@@ -170,9 +170,7 @@ export async function POST(req: NextRequest) {
             tag: "laundry-notification",
             vibrateTimingsMillis: [200, 100, 200],
           },
-          ttl: {
-            seconds: 3600,
-          },
+          ttl: 3600,
         },
       });
 
