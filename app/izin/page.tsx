@@ -80,6 +80,7 @@ function ModalSubmit({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
       if (error) throw error;
 
       // Kirim notifikasi ke super admin
+      console.log("[DEBUG] Sending notification...");
       await sendNotification({
         title: `Pengajuan ${type === "sakit" ? "Sakit" : "Izin"} Baru`,
         body: `Karyawan mengajukan ${type} selama ${hari} hari (${mulai} s/d ${selesai})`,
