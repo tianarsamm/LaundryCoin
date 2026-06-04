@@ -72,7 +72,7 @@ export default function NotificationProvider() {
           const title = payload.notification?.title || 'Notifikasi'
           const body = payload.notification?.body || ''
           
-          // Emit custom event untuk NotificationToast component
+          // Emit custom event untuk NotificationToast component (in-app)
           const event = new CustomEvent('notification:received', {
             detail: {
               title,
@@ -83,13 +83,30 @@ export default function NotificationProvider() {
           })
           window.dispatchEvent(event)
           
-          // Also show browser notification jika permission granted
-          if (Notification.permission === 'granted') {
-            new Notification(title, { 
-              body, 
-              icon: '/logo/Laundry2.png', 
-              tag: 'fcm-foreground' 
-            })
+          // Also show OS notification via Service Worker
+          if (swRegistration && Notification.permission === 'granted') {
+            try {
+              swRegistration.showNotification(title, {
+                body,
+                icon: '/logo/Laundry2.png',
+                badge: '/logo/Laundry2.png',
+                tag: 'laundry-notification',
+                renotify: true,
+                requireInteraction: true,
+                color: '#6366f1',
+                vibrate: [200, 100, 200],
+                sound: 'default',
+                silent: false,
+                dir: 'ltr',
+                data: {
+                  link: payload.webpush?.fcmOptions?.link || '/',
+                  timestamp: Date.now(),
+                },
+              })
+              console.log('[NotificationProvider] ✅ OS notification shown (foreground)')
+            } catch (err) {
+              console.error('[NotificationProvider] ❌ Failed to show OS notification:', err)
+            }
           }
         })
 
