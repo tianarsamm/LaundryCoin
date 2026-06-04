@@ -79,6 +79,56 @@ export async function sendNotification(
 }
 
 /**
+ * Convenience function untuk mengirim notifikasi izin yang baru/diupdate
+ */
+export async function notifyPermissionUpdate(
+  actionType: "created" | "updated" | "approved" | "rejected",
+  employeeName: string,
+  reason?: string
+) {
+  const titleMap = {
+    created: "Izin Baru",
+    updated: "Izin Diperbarui",
+    approved: "Izin Disetujui",
+    rejected: "Izin Ditolak",
+  };
+
+  const title = titleMap[actionType];
+  const body =
+    actionType === "created"
+      ? `${employeeName} telah mengajukan izin baru${reason ? `: ${reason}` : ""}`
+      : actionType === "updated"
+        ? `Izin dari ${employeeName} telah diperbarui`
+        : actionType === "approved"
+          ? `Izin dari ${employeeName} telah disetujui`
+          : `Izin dari ${employeeName} telah ditolak`;
+
+  return sendNotification({ title, body });
+}
+
+/**
+ * Convenience function untuk mengirim notifikasi absensi
+ */
+export async function notifyAbsenceUpdate(
+  actionType: "checked_in" | "checked_out",
+  employeeName: string,
+  time?: string
+) {
+  const titleMap = {
+    checked_in: "Absensi Masuk",
+    checked_out: "Absensi Keluar",
+  };
+
+  const title = titleMap[actionType];
+  const body =
+    actionType === "checked_in"
+      ? `${employeeName} telah melakukan absensi masuk${time ? ` pada ${time}` : ""}`
+      : `${employeeName} telah melakukan absensi keluar${time ? ` pada ${time}` : ""}`;
+
+  return sendNotification({ title, body });
+}
+
+/**
  * Example usage dalam component:
  *
  * import { sendNotification } from "@/lib/notifications/sendNotification";

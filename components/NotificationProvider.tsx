@@ -67,8 +67,25 @@ export default function NotificationProvider() {
           console.log('[NotificationProvider] Foreground message:', payload)
           const title = payload.notification?.title || 'Notifikasi'
           const body = payload.notification?.body || ''
+          
+          // Emit custom event untuk NotificationToast component
+          const event = new CustomEvent('notification:received', {
+            detail: {
+              title,
+              body,
+              timestamp: new Date(),
+              type: 'info',
+            },
+          })
+          window.dispatchEvent(event)
+          
+          // Also show browser notification jika permission granted
           if (Notification.permission === 'granted') {
-            new Notification(title, { body, icon: '/logo/Laundry2.png', tag: 'fcm-foreground' })
+            new Notification(title, { 
+              body, 
+              icon: '/logo/Laundry2.png', 
+              tag: 'fcm-foreground' 
+            })
           }
         })
 

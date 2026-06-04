@@ -3,6 +3,7 @@ import { Sora, DM_Sans } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import NotificationProvider from "@/components/NotificationProvider";
+import { NotificationToast } from "@/components/NotificationToast";
 import "./globals.css";
 
 const sora = Sora({
@@ -39,6 +40,7 @@ export default function RootLayout({
       <body className="layout">
         <ServiceWorkerRegister />
         <NotificationProvider />
+        <NotificationToast />
         <Navbar />
         <main className="layout__main">
           {children}
