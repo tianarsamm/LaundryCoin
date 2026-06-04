@@ -169,7 +169,6 @@ export async function POST(req: NextRequest) {
             priority: "high",
             tag: "laundry-notification",
             vibrateTimingsMillis: [200, 100, 200],
-            notification_priority: "PRIORITY_MAX",
           },
           ttl: {
             seconds: 3600,
