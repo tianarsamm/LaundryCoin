@@ -87,13 +87,19 @@ function ModalReview({
         .eq("id", item.id);
       if (error) throw error;
 
-      // Kirim notifikasi ke user yang mengajukan
+      // 1. Kirim notifikasi ke user yang mengajukan
       await sendNotification({
         title: action === "approved" ? "Pengajuan Disetujui ✓" : "Pengajuan Ditolak",
         body: action === "approved"
           ? `Pengajuan ${TYPE_CFG[item.leave_type].label} Anda telah disetujui.`
           : `Pengajuan ${TYPE_CFG[item.leave_type].label} Anda ditolak.${catatan ? ` Catatan: ${catatan}` : ""}`,
         userId: item.user_id,
+      });
+
+      // 2. Kirim notifikasi ke super admin lainnya tentang action yang dilakukan
+      await sendNotification({
+        title: `Izin ${action === "approved" ? "Disetujui" : "Ditolak"}`,
+        body: `${user?.email} telah ${action === "approved" ? "menyetujui" : "menolak"} pengajuan ${TYPE_CFG[item.leave_type].label} dari ${item.nama}.`,
       });
 
       onDone();
