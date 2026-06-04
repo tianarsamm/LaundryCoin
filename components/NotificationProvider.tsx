@@ -25,12 +25,16 @@ export default function NotificationProvider() {
 
         const permission = await Notification.requestPermission()
         if (permission !== 'granted') {
-          console.warn('[NotificationProvider] Permission denied')
+          console.warn('[NotificationProvider] ⚠️ Notification permission denied by user')
+          // Store that user denied for later reference
+          localStorage.setItem('notification_permission_denied', 'true')
           return
         }
+        
+        console.log('[NotificationProvider] ✅ Notification permission granted')
 
         const swRegistration = await navigator.serviceWorker.ready
-        console.log('[NotificationProvider] Service worker ready')
+        console.log('[NotificationProvider] ✅ Service worker registered:', swRegistration.scope)
 
         const messaging = getMessaging(firebaseApp)
         const token = await getToken(messaging, {
@@ -39,11 +43,11 @@ export default function NotificationProvider() {
         })
 
         if (!token) {
-          console.warn('[NotificationProvider] Failed to get FCM token')
+          console.error('[NotificationProvider] ❌ Failed to get FCM token - check Firebase config')
           return
         }
 
-        console.log('[NotificationProvider] FCM token:', token.slice(0, 20) + '...')
+        console.log('[NotificationProvider] ✅ FCM token received:', token.slice(0, 20) + '...')
 
         const { error } = await supabase.from('user_devices').upsert(
           {

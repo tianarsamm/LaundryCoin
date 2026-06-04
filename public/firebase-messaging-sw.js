@@ -27,17 +27,31 @@ messaging.onBackgroundMessage((payload) => {
 
   try {
     const notificationTitle = payload.notification?.title || "Notifikasi";
+    const notificationBody = payload.notification?.body || "";
+    
     const notificationOptions = {
-      body: payload.notification?.body || "",
+      // UI Elements
+      body: notificationBody,
       icon: "/logo/Laundry2.png",
       badge: "/logo/Laundry2.png",
-      tag: "firebase-notification",
-      renotify: true,
-      requireInteraction: true,
-      data: payload.data || {},
+      
+      // Behavior
+      tag: "laundry-notification", // Unique ID - hanya 1 notifikasi per tag
+      renotify: true, // Notifikasi ulang jika sudah ada
+      requireInteraction: true, // Jangan auto-dismiss, tunggu user action
+      
+      // Visual
+      color: "#6366f1", // Warna accent (Android)
+      vibrate: [200, 100, 200], // Vibrate pattern (Mobile)
+      
+      // Data & Links
+      data: {
+        ...payload.data,
+        link: payload.webpush?.fcmOptions?.link || "/",
+      },
     };
 
-    console.log("[Firebase SW] Showing notification:", {
+    console.log("[Firebase SW] Showing OS notification:", {
       title: notificationTitle,
       options: notificationOptions,
     });
@@ -45,39 +59,58 @@ messaging.onBackgroundMessage((payload) => {
     self.registration
       .showNotification(notificationTitle, notificationOptions)
       .then(() => {
-        console.log("[Firebase SW] Notification shown successfully");
+        console.log("[Firebase SW] ✅ OS Notification shown successfully");
       })
       .catch((error) => {
         console.error(
-          "[Firebase SW] Error showing notification:",
+          "[Firebase SW] ❌ Error showing notification:",
           error.message,
           error
         );
       });
   } catch (error) {
     console.error(
-      "[Firebase SW] Error in onBackgroundMessage handler:",
+      "[Firebase SW] ❌ Error in onBackgroundMessage handler:",
       error.message,
       error
     );
   }
 });
 
-// Handle notification clicks
+// Handle notification clicks (membuka app atau navigate)
 self.addEventListener("notificationclick", (event) => {
+  console.log("[Firebase SW] Notification clicked:", event.notification);
   event.notification.close();
+
+  const link = event.notification.data?.link || "/";
+
   event.waitUntil(
-    clients.matchAll({ type: "window" }).then((clientList) => {
-      // Check if app window already open
-      for (let client of clientList) {
-        if (client.url === "/" && "focus" in client) {
-          return client.focus();
+    clients
+      .matchAll({ type: "window", includeUncontrolled: true })
+      .then((clientList) => {
+        // Check if app already open
+        for (let i = 0; i < clientList.length; i++) {
+          const client = clientList[i];
+          if (client.url === link && "focus" in client) {
+            console.log("[Firebase SW] ✅ App already open, focusing...");
+            return client.focus();
+          }
         }
-      }
-      // Otherwise open new window
-      if (clients.openWindow) {
-        return clients.openWindow("/");
-      }
-    })
+        
+        // If same URL exists but different path, navigate
+        for (let i = 0; i < clientList.length; i++) {
+          const client = clientList[i];
+          if ("navigate" in client) {
+            console.log("[Firebase SW] ✅ Navigating existing window to:", link);
+            return client.navigate(link).then((c) => c && c.focus());
+          }
+        }
+        
+        // Otherwise open new window
+        if (clients.openWindow) {
+          console.log("[Firebase SW] ✅ Opening new window:", link);
+          return clients.openWindow(link);
+        }
+      })
   );
 });

@@ -126,16 +126,49 @@ export async function POST(req: NextRequest) {
           title,
           body: messageBody,
         },
+        // Web push configuration untuk browser & mobile web
         webpush: {
           notification: {
+            // UI Elements
+            title, // Redundant tapi ensure consistency
+            body: messageBody,
             icon: "/logo/Laundry2.png",
             badge: "/logo/Laundry2.png",
-            tag: "laundry-notification",
-            requireInteraction: true,
+            
+            // Behavior
+            tag: "laundry-notification", // Unique ID - hanya 1 notifikasi per tag
+            renotify: true, // Notifikasi ulang jika ada update
+            requireInteraction: true, // Jangan auto-dismiss
+            
+            // Visual (Android)
+            vibrate: [200, 100, 200],
+            color: "#6366f1",
+            
+            // Mobile optimized
+            silent: false,
+            dir: "ltr",
           },
           fcmOptions: {
             link: "/manajemen/izin",
           },
+          headers: {
+            "TTL": "3600", // Delivery window: 1 hour
+          },
+        },
+        // Android-specific config
+        android: {
+          notification: {
+            title,
+            body: messageBody,
+            icon: "notification_icon", // Reference to drawable in Android
+            color: "#6366f1",
+            sound: "default",
+            channelId: "laundry-notifications",
+            priority: "high", // Important notifications
+            tag: "laundry-notification",
+          },
+          ttl: 3600,
+          restrictedPackageName: undefined, // Allow all packages
         },
       });
 
