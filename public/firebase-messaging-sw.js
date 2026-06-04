@@ -25,20 +25,42 @@ const messaging = firebase.messaging();
 messaging.onBackgroundMessage((payload) => {
   console.log("[Firebase SW] Received background message:", payload);
 
-  const notificationTitle = payload.notification?.title || "Notifikasi";
-  const notificationOptions = {
-    body: payload.notification?.body || "",
-    icon: "/logo/Laundry2.png",
-    badge: "/logo/Laundry2.png",
-    tag: "firebase-notification",
-    renotify: true,
-    data: payload.data || {},
-  };
+  try {
+    const notificationTitle = payload.notification?.title || "Notifikasi";
+    const notificationOptions = {
+      body: payload.notification?.body || "",
+      icon: "/logo/Laundry2.png",
+      badge: "/logo/Laundry2.png",
+      tag: "firebase-notification",
+      renotify: true,
+      requireInteraction: true,
+      data: payload.data || {},
+    };
 
-  self.registration.showNotification(
-    notificationTitle,
-    notificationOptions
-  );
+    console.log("[Firebase SW] Showing notification:", {
+      title: notificationTitle,
+      options: notificationOptions,
+    });
+
+    self.registration
+      .showNotification(notificationTitle, notificationOptions)
+      .then(() => {
+        console.log("[Firebase SW] Notification shown successfully");
+      })
+      .catch((error) => {
+        console.error(
+          "[Firebase SW] Error showing notification:",
+          error.message,
+          error
+        );
+      });
+  } catch (error) {
+    console.error(
+      "[Firebase SW] Error in onBackgroundMessage handler:",
+      error.message,
+      error
+    );
+  }
 });
 
 // Handle notification clicks
