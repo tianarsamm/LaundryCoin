@@ -79,17 +79,16 @@ export function useAuth(): AuthState & {
 
       // ========================================================
       // Register FCM Device
-      // Hanya untuk Super Admin
+      // Untuk semua user (super admin, admin, karyawan)
+      // agar bisa menerima push notifications
       // ========================================================
-      if (userProfile.role === "super_admin") {
-        try {
-          await registerDevice(authUser.id);
-        } catch (err) {
-          console.error(
-            "[FCM] Failed to register device:",
-            err
-          );
-        }
+      try {
+        await registerDevice(authUser.id);
+      } catch (err) {
+        console.error(
+          "[FCM] Failed to register device:",
+          err
+        );
       }
 
       // ========================================================
