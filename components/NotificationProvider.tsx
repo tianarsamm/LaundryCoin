@@ -92,14 +92,11 @@ export default function NotificationProvider() {
                 badge: '/logo/Laundry2.png',
                 tag: 'laundry-notification',
                 requireInteraction: true,
-                vibrate: [200, 100, 200],
-                silent: false,
-                dir: 'ltr',
                 data: {
                   link: payload.webpush?.fcmOptions?.link || '/',
                   timestamp: Date.now(),
                 },
-              })
+              } as NotificationOptions)
               console.log('[NotificationProvider] ✅ OS notification shown (foreground)')
             } catch (err) {
               console.error('[NotificationProvider] ❌ Failed to show OS notification:', err)
