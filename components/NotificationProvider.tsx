@@ -93,7 +93,7 @@ export default function NotificationProvider() {
                 tag: 'laundry-notification',
                 requireInteraction: true,
                 data: {
-                  link: payload.webpush?.fcmOptions?.link || '/',
+                  link: (payload as any).webpush?.fcmOptions?.link || '/manajemen/izin',
                   timestamp: Date.now(),
                 },
               } as NotificationOptions)
