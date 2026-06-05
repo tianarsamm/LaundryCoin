@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useNotifications, NotifType } from "@/context/NotificationContext";
 
 // ─── Config ───────────────────────────────────────────────────────
@@ -16,7 +16,7 @@ interface ToastItem {
 }
 
 // ─── Icons ────────────────────────────────────────────────────────
-const ICONS: Record<NotifType, JSX.Element> = {
+const ICONS: Record<NotifType, React.ReactElement> = {
   success: (
     <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
       <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
