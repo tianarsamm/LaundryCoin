@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
 import { useNotify } from "@/hooks/useNotify";
+import { sendNotification } from "@/lib/notifications/sendNotification";
 
 // ─── Types ────────────────────────────────────────────────────────
 type LeaveType = "sakit" | "izin";
@@ -88,13 +89,12 @@ function ModalReview({
         .eq("id", item.id);
       if (error) throw error;
 
-      // 1. Kirim notifikasi ke user yang mengajukan (push + in-app)
-      await notify({
+      // 1. Kirim notifikasi PUSH ke user yang mengajukan (hanya push, tidak in-app di super admin)
+      await sendNotification({
         title: action === "approved" ? "Pengajuan Disetujui ✓" : "Pengajuan Ditolak",
         body: action === "approved"
           ? `Pengajuan ${TYPE_CFG[item.leave_type].label} Anda telah disetujui.`
           : `Pengajuan ${TYPE_CFG[item.leave_type].label} Anda ditolak.${catatan ? ` Catatan: ${catatan}` : ""}`,
-        type: action === "approved" ? "success" : "error",
         userId: item.user_id,
       });
 
