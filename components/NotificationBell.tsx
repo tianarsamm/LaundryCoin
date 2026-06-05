@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useNotifications, NotifType } from "@/context/NotificationContext";
 
 // ─── Type config ──────────────────────────────────────────────────
-const TYPE_CFG: Record<NotifType, { icon: JSX.Element; color: string; bg: string }> = {
+const TYPE_CFG: Record<NotifType, { icon: React.ReactElement; color: string; bg: string }> = {
   success: {
     icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>,
     color: "#4ade80",
