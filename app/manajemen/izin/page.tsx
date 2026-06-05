@@ -1,8 +1,8 @@
 "use client";
 
-import { sendNotification } from "@/lib/notifications/sendNotification";
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase/client";
+import { useNotify } from "@/hooks/useNotify";
 
 // ─── Types ────────────────────────────────────────────────────────
 type LeaveType = "sakit" | "izin";
@@ -63,6 +63,7 @@ function ModalReview({
   onClose: () => void;
   onDone: () => void;
 }) {
+  const { notify } = useNotify();
   const [action, setAction] = useState<"approved" | "rejected" | null>(null);
   const [catatan, setCatatan] = useState("");
   const [loading, setLoading] = useState(false);
@@ -87,19 +88,21 @@ function ModalReview({
         .eq("id", item.id);
       if (error) throw error;
 
-      // 1. Kirim notifikasi ke user yang mengajukan
-      await sendNotification({
+      // 1. Kirim notifikasi ke user yang mengajukan (push + in-app)
+      await notify({
         title: action === "approved" ? "Pengajuan Disetujui ✓" : "Pengajuan Ditolak",
         body: action === "approved"
           ? `Pengajuan ${TYPE_CFG[item.leave_type].label} Anda telah disetujui.`
           : `Pengajuan ${TYPE_CFG[item.leave_type].label} Anda ditolak.${catatan ? ` Catatan: ${catatan}` : ""}`,
+        type: action === "approved" ? "success" : "error",
         userId: item.user_id,
       });
 
-      // 2. Kirim notifikasi ke super admin lainnya tentang action yang dilakukan
-      await sendNotification({
+      // 2. Notifikasi ke super admin (in-app langsung terlihat + push ke device lain)
+      await notify({
         title: `Izin ${action === "approved" ? "Disetujui" : "Ditolak"}`,
         body: `${user?.email} telah ${action === "approved" ? "menyetujui" : "menolak"} pengajuan ${TYPE_CFG[item.leave_type].label} dari ${item.nama}.`,
+        type: "info",
       });
 
       onDone();
@@ -249,16 +252,15 @@ function ModalReview({
 
 // ─── Main Admin Page ──────────────────────────────────────────────
 export default function AdminIzinPage() {
+  const { notify } = useNotify();
   const [list, setList] = useState<LeaveRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<FilterTab>("pending");
   const [review, setReview] = useState<LeaveRequest | null>(null);
-  const [toast, setToast] = useState<string | null>(null);
 
   const fetchList = useCallback(async () => {
     setLoading(true);
     try {
-      // Join dengan tabel users untuk dapat nama karyawan
       const { data, error } = await supabase
         .from("leave_requests")
         .select(`
@@ -287,9 +289,8 @@ export default function AdminIzinPage() {
   useEffect(() => { fetchList(); }, [fetchList]);
 
   const handleDone = () => {
-    setToast("Status pengajuan berhasil diperbarui.");
+    // Toast sekarang ditangani oleh ToastContainer via useNotify di ModalReview
     fetchList();
-    setTimeout(() => setToast(null), 4000);
   };
 
   const filtered = tab === "all" ? list : list.filter(l => l.leave_status === tab);
@@ -308,13 +309,6 @@ export default function AdminIzinPage() {
   return (
     <div className="pg">
       {review && <ModalReview item={review} onClose={() => setReview(null)} onDone={handleDone} />}
-
-      {/* Toast */}
-      {toast && (
-        <div className="toast">
-          <ICheck /> {toast}
-        </div>
-      )}
 
       {/* Header */}
       <div className="header">
@@ -386,10 +380,8 @@ export default function AdminIzinPage() {
 
           return (
             <div key={item.id} className={`item ${i < filtered.length - 1 ? "item-border" : ""}`}>
-              {/* Icon */}
               <div className="item-icon">{tp.icon}</div>
 
-              {/* Body */}
               <div className="item-body">
                 <div className="item-top">
                   <span className="item-nama">{item.nama ?? "—"}</span>
@@ -407,7 +399,6 @@ export default function AdminIzinPage() {
                 )}
               </div>
 
-              {/* Right */}
               <div className="item-right">
                 <span className="status-badge" style={{ color: st.color, background: st.bg, border: `1px solid ${st.border}` }}>
                   {st.label}
@@ -431,8 +422,6 @@ export default function AdminIzinPage() {
         .header p{font-size:0.85rem;color:#64748b;margin:0}
         .pending-badge{display:flex;align-items:center;padding:0.5rem 1rem;background:rgba(251,191,36,0.1);border:1px solid rgba(251,191,36,0.25);border-radius:9px;color:#fbbf24;font-size:0.82rem;font-weight:700;white-space:nowrap;animation:pulse 2s ease-in-out infinite}
         @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.7}}
-        .toast{position:fixed;bottom:2rem;right:2rem;z-index:100;display:flex;align-items:center;gap:8px;padding:0.75rem 1.25rem;background:#0f172a;border:1px solid rgba(74,222,128,0.3);border-radius:12px;color:#4ade80;font-size:0.875rem;font-weight:600;box-shadow:0 8px 32px rgba(0,0,0,0.4);animation:slideIn 0.2s}
-        @keyframes slideIn{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
         .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0.75rem}
         .stat-card{padding:1rem;background:rgba(15,23,42,0.7);border:1px solid rgba(51,65,85,0.5);border-radius:12px;display:flex;flex-direction:column;gap:3px}
         .stat-num{font-size:1.3rem;font-weight:800;color:#fff}
@@ -476,84 +465,18 @@ export default function AdminIzinPage() {
           .pg { padding: 1.25rem; gap: 1rem; }
           .header { flex-direction: column; }
           .header h1 { font-size: 1.35rem; }
-          .header p { font-size: 0.8rem; }
-          .pending-badge { font-size: 0.78rem; padding: 0.45rem 0.9rem; }
           .stats { grid-template-columns: repeat(2, 1fr); gap: 0.625rem; }
-          .stat-card { padding: 0.9rem; }
-          .stat-num { font-size: 1.2rem; }
-          .stat-lbl { font-size: 0.65rem; }
           .tabs { overflow-x: auto; gap: 3px; }
-          .tab { padding: 5px 14px; font-size: 0.78rem; }
           .item { padding: 0.95rem 1.1rem; gap: 10px; }
-          .item-icon { width: 32px; height: 32px; font-size: 1rem; }
-          .item-nama { font-size: 0.85rem; }
-          .role-pill { font-size: 0.65rem; padding: 1px 6px; }
-          .item-type-pill { font-size: 0.65rem; }
-          .item-dates { font-size: 0.75rem; }
-          .dur-pill { font-size: 0.65rem; padding: 1px 6px; }
-          .item-ket { font-size: 0.75rem; }
-          .admin-note { font-size: 0.73rem; padding: 4px 8px; }
-          .btn-review { font-size: 0.73rem; padding: 4px 10px; }
-          .item-date { font-size: 0.65rem; }
-          .toast { bottom: 1.5rem; right: 1.5rem; font-size: 0.8rem; }
         }
-
-        @media (max-width: 640px) {
-          .pg { padding: 1rem; gap: 0.875rem; padding-bottom: 3.5rem; }
-          .header h1 { font-size: clamp(1.2rem, 1.8vw, 1.5rem); }
-          .header p { font-size: 0.77rem; }
-          .pending-badge { font-size: 0.75rem; padding: 0.4rem 0.85rem; }
-          .stats { grid-template-columns: repeat(2, 1fr); gap: 0.5rem; }
-          .stat-card { padding: 0.8rem; }
-          .stat-num { font-size: 1.1rem; }
-          .stat-lbl { font-size: 0.6rem; letter-spacing: 0.3px; }
-          .tabs { overflow-x: auto; -webkit-overflow-scrolling: touch; width: 100%; padding: 3px; }
-          .tab { padding: 4px 12px; font-size: 0.75rem; }
-          .item { padding: 0.8rem 0.9rem; }
-          .item-icon { width: 30px; height: 30px; margin-top: 1px; }
-          .item-nama { font-size: 0.8rem; }
-          .item-top { gap: 5px; }
-          .role-pill { font-size: 0.62rem; padding: 0px 5px; }
-          .item-type-pill { font-size: 0.62rem; }
-          .item-dates { font-size: 0.72rem; gap: 5px; }
-          .dur-pill { font-size: 0.6rem; padding: 0px 5px; }
-          .item-ket { font-size: 0.72rem; }
-          .item-right { gap: 5px; }
-          .admin-note { font-size: 0.7rem; padding: 3px 7px; }
-          .btn-review { font-size: 0.7rem; padding: 3px 8px; }
-          .status-badge { font-size: 0.65rem; padding: 2px 8px; }
-          .item-date { font-size: 0.62rem; }
-          .toast { bottom: 1.25rem; right: 1rem; font-size: 0.75rem; padding: 0.6rem 1rem; }
+        @media (max-width: 600px) {
+          .stats { grid-template-columns: repeat(2,1fr); }
+          .tabs { width: 100%; overflow-x: auto; }
         }
-
         @media (max-width: 480px) {
           .pg { padding: 0.75rem; }
-          .header h1 { font-size: 1.3rem; }
-          .stats { grid-template-columns: 1fr; gap: 0.5rem; }
-          .stat-card { padding: 0.75rem; }
-          .stat-num { font-size: 1rem; }
-          .stat-lbl { font-size: 0.58rem; }
-          .tab { padding: 3px 10px; font-size: 0.7rem; }
-          .item { padding: 0.7rem 0.8rem; gap: 8px; }
-          .item-icon { width: 28px; height: 28px; font-size: 0.95rem; }
-          .item-nama { font-size: 0.75rem; }
-          .role-pill { font-size: 0.58rem; }
-          .item-dates { font-size: 0.68rem; }
-          .dur-pill { font-size: 0.55rem; }
-          .item-ket { font-size: 0.68rem; }
-          .btn-review { font-size: 0.65rem; padding: 2px 6px; }
-          .toast { bottom: 1rem; right: 0.75rem; }
-        }
-
-        @media (max-width: 360px) {
-          .pg { padding: 0.5rem; }
-          .header h1 { font-size: 1.2rem; }
           .stats { grid-template-columns: 1fr; }
-          .item { padding: 0.6rem 0.7rem; }
-          .item-icon { width: 26px; height: 26px; }
         }
-        
-        @media(max-width:600px){.stats{grid-template-columns:repeat(2,1fr)}.tabs{width:100%;overflow-x:auto}}
       `}</style>
     </div>
   );

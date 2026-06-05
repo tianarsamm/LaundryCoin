@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { Sora, DM_Sans } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
-import NotificationProvider from "@/components/NotificationProvider";
-import { NotificationToast } from "@/components/NotificationToast";
+import { NotificationProvider } from "@/context/NotificationContext";
+import { ToastContainer } from "@/components/ToastContainer";
 import "./globals.css";
 
 const sora = Sora({
@@ -45,12 +45,14 @@ export default function RootLayout({
     <html lang="id" className={`${sora.variable} ${dmSans.variable}`}>
       <body className="layout">
         <ServiceWorkerRegister />
-        <NotificationProvider />
-        <NotificationToast />
-        <Navbar />
-        <main className="layout__main">
-          {children}
-        </main>
+        <NotificationProvider>
+          {/* Toast in-app — muncul di pojok kanan bawah navbar, tidak blocking */}
+          <ToastContainer />
+          <Navbar />
+          <main className="layout__main">
+            {children}
+          </main>
+        </NotificationProvider>
       </body>
     </html>
   );

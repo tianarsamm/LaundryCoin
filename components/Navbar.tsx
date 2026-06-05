@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/supabase/hooks/useAuth";
+import { NotificationBell } from "@/components/NotificationBell";
 import type { MenuKey } from "@/lib/auth-types";
 
 interface NavItem {
@@ -162,6 +163,9 @@ export default function Navbar() {
 
           {user && (
             <div className="navbar__right-section">
+              {/* ── Bell Notifikasi ── */}
+              <NotificationBell />
+
               <div className="navbar__profile">
                 <div className="navbar__profile-avatar">
                   {(user.username ?? user.nama).charAt(0).toUpperCase()}
@@ -227,6 +231,14 @@ export default function Navbar() {
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
+        </div>
+
+        <div className="drawer__divider" />
+
+        {/* Bell notifikasi di mobile drawer */}
+        <div className="drawer__notif-row">
+          <span className="drawer__notif-label">Notifikasi</span>
+          <NotificationBell />
         </div>
 
         <div className="drawer__divider" />
@@ -365,11 +377,11 @@ export default function Navbar() {
           box-shadow: 0 0 8px var(--color-primary);
         }
 
-        /* Profile */
+        /* Profile + right section */
         .navbar__right-section {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 0.75rem;
           margin-left: 1rem;
         }
         .navbar__profile {
@@ -504,6 +516,22 @@ export default function Navbar() {
           background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
           margin: 0 1.25rem;
         }
+
+        /* Notif row di mobile drawer */
+        .drawer__notif-row {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 0.9rem 1.25rem;
+        }
+        .drawer__notif-label {
+          font-size: 0.78rem;
+          font-weight: 700;
+          color: var(--color-text-muted);
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
         .drawer__menu {
           list-style: none;
           margin: 1.5rem 0 0; padding: 0 1rem;
@@ -528,19 +556,6 @@ export default function Navbar() {
         .drawer__link--active {
           background: rgba(99, 102, 241, 0.12); color: #ffffff;
           box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.2);
-        }
-        .drawer__link-icon-wrap {
-          display: flex; align-items: center; justify-content: center;
-          width: 32px; height: 32px;
-          background: rgba(255, 255, 255, 0.04);
-          border-radius: 10px; flex-shrink: 0;
-          transition: all 0.2s ease;
-          color: var(--color-text-muted);
-        }
-        .drawer__link--active .drawer__link-icon-wrap {
-          background: linear-gradient(135deg, var(--color-primary), #8b5cf6);
-          color: white;
-          box-shadow: 0 4px 10px rgba(99, 102, 241, 0.3);
         }
         .drawer__active-pip {
           margin-left: auto;
