@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { ToastContainer } from "@/components/ToastContainer";
+import NotificationSetup from "@/components/NotificationSetup";
 import "./globals.css";
 
 const sora = Sora({
@@ -45,6 +46,7 @@ export default function RootLayout({
     <html lang="id" className={`${sora.variable} ${dmSans.variable}`}>
       <body className="layout">
         <ServiceWorkerRegister />
+        <NotificationSetup />
         <NotificationProvider>
           {/* Toast in-app — muncul di pojok kanan bawah navbar, tidak blocking */}
           <ToastContainer />
