@@ -102,36 +102,30 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Kirim notifikasi push ke owner
+  // Kirim notifikasi FCM ke super admin
   try {
     const { data: userData } = await supabase
       .from('users').select('nama').eq('id', user.id).single()
-    const { data: admins } = await supabase
-      .from('users').select('id').eq('role', 'super_admin')
-    if (admins?.length) {
-      const { data: subs } = await supabase
-        .from('push_subscriptions')
-        .select('*')
-        .in('user_id', admins.map(a => a.id))
-      if (subs?.length) {
-        const jam = new Date(log.created_at).toLocaleTimeString('id-ID', {
-          hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Makassar'
-        })
-        await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/send-push`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}`,
-          },
-          body: JSON.stringify({
-            subscriptions: subs,
-            title: type === 'checkin' ? '🟢 Check In' : '🔴 Check Out',
-            body: `${userData?.nama ?? 'Karyawan'} — ${jam} WITA`,
-          }),
-        })
-      }
-    }
-  } catch (e) { console.error('Push error:', e) }
+    
+    const jam = new Date(log.created_at).toLocaleTimeString('id-ID', {
+      hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Makassar'
+    })
+    
+    const title = type === 'checkin' ? 'Check In' : 'Check Out'
+    const body = `${userData?.nama ?? 'Karyawan'} — ${jam} WITA`
+    
+    // Send FCM notification to all super admins
+    await fetch(`${req.nextUrl.origin}/api/notifications/send`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        title,
+        body,
+      }),
+    })
+  } catch (e) { console.error('[Absensi] Notification error:', e) }
 
   return NextResponse.json({ data: log })
 }
