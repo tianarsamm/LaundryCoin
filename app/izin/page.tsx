@@ -80,7 +80,6 @@ function ModalSubmit({ onClose, onSuccess }: { onClose: () => void; onSuccess: (
       if (error) throw error;
 
       // Kirim notifikasi ke super admin
-      const { data: { user } } = await supabase.auth.getUser();
       const userEmail = user?.email || "Karyawan";
       console.log("[DEBUG] Sending notification...");
       const result = await sendNotification({
