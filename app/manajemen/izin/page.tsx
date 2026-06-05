@@ -98,11 +98,12 @@ function ModalReview({
         userId: item.user_id,
       });
 
-      // 2. Notifikasi ke super admin (in-app langsung terlihat + push ke device lain)
+      // 2. Notifikasi ke super admin (in-app only, jangan push karena dia sudah online)
       await notify({
         title: `Izin ${action === "approved" ? "Disetujui" : "Ditolak"}`,
-        body: `${user?.email} telah ${action === "approved" ? "menyetujui" : "menolak"} pengajuan ${TYPE_CFG[item.leave_type].label} dari ${item.nama}.`,
+        body: `Anda telah ${action === "approved" ? "menyetujui" : "menolak"} pengajuan ${TYPE_CFG[item.leave_type].label} dari ${item.nama}.`,
         type: "info",
+        inAppOnly: true,
       });
 
       onDone();
