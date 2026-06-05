@@ -57,7 +57,7 @@ export default function NotificationProvider() {
             device_name: navigator.userAgent.slice(0, 100),
             updated_at: new Date().toISOString(),
           },
-          { onConflict: 'user_id,fcm_token' }
+          { onConflict: 'user_id,device_type' }
         )
 
         if (error) {
@@ -91,11 +91,8 @@ export default function NotificationProvider() {
                 icon: '/logo/Laundry2.png',
                 badge: '/logo/Laundry2.png',
                 tag: 'laundry-notification',
-                renotify: true,
                 requireInteraction: true,
-                color: '#6366f1',
                 vibrate: [200, 100, 200],
-                sound: 'default',
                 silent: false,
                 dir: 'ltr',
                 data: {
