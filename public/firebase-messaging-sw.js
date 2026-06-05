@@ -34,7 +34,7 @@ messaging.onBackgroundMessage((payload) => {
       // UI Elements
       body: notificationBody,
       icon: "/logo/Laundry2.png",
-      badge: "/logo/Laundry2.png",
+      badge: "/logo/Laundry1.png",
       
       // Critical for Android notification panel
       tag: "laundry-notification", // Unique ID
