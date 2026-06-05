@@ -30,7 +30,8 @@ export async function registerDevice(
           updated_at: new Date().toISOString(),
         },
         {
-          onConflict: "user_id,fcm_token",
+          onConflict: "user_id,device_type",
+          ignoreDuplicates: false,
         }
       );
 
