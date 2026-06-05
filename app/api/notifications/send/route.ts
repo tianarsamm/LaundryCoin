@@ -132,9 +132,9 @@ export async function POST(req: NextRequest) {
             // UI Elements
             title,
             body: messageBody,
-            icon: "/logo/Laundry.png",
-            badge: "/logo/Laundry.png",
-            image: "/logo/Laundry.png",
+            icon: "/logo/Laundry2.png",
+            badge: "/logo/Laundry2.png",
+            image: "/logo/Laundry2.png",
             
             // Critical for Android notification panel visibility
             tag: "laundry-notification",

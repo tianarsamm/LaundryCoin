@@ -88,8 +88,8 @@ export default function NotificationProvider() {
             try {
               swRegistration.showNotification(title, {
                 body,
-                icon: '/logo/Laundry.png',
-                badge: '/logo/Laundry.png',
+                icon: '/logo/Laundry2.png',
+                badge: '/logo/Laundry2.png',
                 tag: 'laundry-notification',
                 requireInteraction: true,
                 data: {
