@@ -72,10 +72,7 @@ function LoginForm() {
 
   return (
     <div className="card">
-      {/* Shimmer border effect */}
       <div className="card-border" />
-
-      {/* Top accent line */}
       <div className="accent-line" />
 
       {/* Logo */}
@@ -182,18 +179,14 @@ function LoginForm() {
           z-index: 1;
           width: 100%;
           max-width: 420px;
-          background: linear-gradient(160deg, rgba(17,24,39,0.97) 0%, rgba(9,14,27,0.99) 100%);
+          background: var(--login-card-bg);
           border-radius: 24px;
           padding: 2.75rem 2.5rem 2.25rem;
           display: flex;
           flex-direction: column;
           gap: 1.6rem;
           animation: riseIn 0.45s cubic-bezier(0.22,1,0.36,1) both;
-          box-shadow:
-            0 0 0 1px rgba(99,102,241,0.12),
-            0 32px 80px rgba(0,0,0,0.5),
-            0 8px 24px rgba(0,0,0,0.3),
-            inset 0 1px 0 rgba(255,255,255,0.04);
+          box-shadow: var(--login-card-shadow);
         }
         @keyframes riseIn {
           from { opacity:0; transform: translateY(28px) scale(0.97); }
@@ -206,12 +199,7 @@ function LoginForm() {
           inset: 0;
           border-radius: 24px;
           padding: 1px;
-          background: linear-gradient(135deg,
-            rgba(129,140,248,0.5) 0%,
-            rgba(34,211,238,0.15) 40%,
-            rgba(99,102,241,0.05) 60%,
-            rgba(129,140,248,0.3) 100%
-          );
+          background: var(--login-card-border);
           -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
           -webkit-mask-composite: xor;
           mask-composite: exclude;
@@ -252,7 +240,7 @@ function LoginForm() {
         .logo-name {
           font-size: 1.05rem;
           font-weight: 700;
-          color: #e2e8f0;
+          color: var(--login-logo-name);
           letter-spacing: -0.2px;
           font-family: var(--font-display, 'Georgia', serif);
         }
@@ -278,14 +266,14 @@ function LoginForm() {
         .heading h1 {
           font-size: 1.65rem;
           font-weight: 800;
-          color: #f1f5f9;
+          color: var(--login-heading);
           margin: 0 0 6px;
           letter-spacing: -0.5px;
           line-height: 1.15;
           font-family: var(--font-display, 'Georgia', serif);
         }
         .heading p {
-          color: rgba(148,163,184,0.75);
+          color: var(--login-subtext);
           font-size: 0.85rem;
           margin: 0;
           line-height: 1.5;
@@ -300,7 +288,7 @@ function LoginForm() {
           background: rgba(239,68,68,0.08);
           border: 1px solid rgba(239,68,68,0.2);
           border-radius: 10px;
-          color: #fca5a5;
+          color: #ef4444;
           font-size: 0.82rem;
           font-weight: 500;
           line-height: 1.5;
@@ -328,7 +316,7 @@ function LoginForm() {
         .field label {
           font-size: 0.75rem;
           font-weight: 700;
-          color: rgba(148,163,184,0.7);
+          color: var(--login-label);
           letter-spacing: 0.5px;
           text-transform: uppercase;
         }
@@ -340,7 +328,7 @@ function LoginForm() {
         .field-icon {
           position: absolute;
           left: 14px;
-          color: rgba(100,116,139,0.7);
+          color: var(--login-icon);
           pointer-events: none;
           transition: color 0.2s;
         }
@@ -350,20 +338,20 @@ function LoginForm() {
         .input-wrap input {
           width: 100%;
           padding: 0.8rem 1rem 0.8rem 2.6rem;
-          background: rgba(15,23,42,0.6);
-          border: 1px solid rgba(51,65,85,0.7);
+          background: var(--login-input-bg);
+          border: 1px solid var(--login-input-border);
           border-radius: 12px;
-          color: #e2e8f0;
+          color: var(--login-input-text);
           font-size: 0.9rem;
           transition: all 0.2s ease;
           outline: none;
         }
         .input-wrap input::placeholder {
-          color: rgba(100,116,139,0.5);
+          color: var(--login-placeholder);
         }
         .input-wrap input:focus {
           border-color: rgba(129,140,248,0.5);
-          background: rgba(15,23,42,0.8);
+          background: var(--login-input-bg-focus);
           box-shadow:
             0 0 0 3px rgba(99,102,241,0.12),
             inset 0 1px 0 rgba(255,255,255,0.03);
@@ -377,7 +365,7 @@ function LoginForm() {
           right: 12px;
           background: none;
           border: none;
-          color: rgba(100,116,139,0.6);
+          color: var(--login-icon);
           cursor: pointer;
           display: flex;
           align-items: center;
@@ -385,7 +373,7 @@ function LoginForm() {
           transition: color 0.15s;
           border-radius: 4px;
         }
-        .eye-btn:hover { color: #94a3b8; }
+        .eye-btn:hover { color: var(--login-subtext); }
 
         /* ── Submit button ── */
         .btn-submit {
@@ -404,13 +392,8 @@ function LoginForm() {
           transform: translateY(-1px);
           box-shadow: 0 8px 28px rgba(99,102,241,0.35);
         }
-        .btn-submit:active:not(:disabled) {
-          transform: translateY(0);
-        }
-        .btn-submit:disabled {
-          opacity: 0.65;
-          cursor: not-allowed;
-        }
+        .btn-submit:active:not(:disabled) { transform: translateY(0); }
+        .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; }
         .btn-bg {
           position: absolute;
           inset: 0;
@@ -436,8 +419,7 @@ function LoginForm() {
 
         /* ── Spinner ── */
         .spinner {
-          width: 15px;
-          height: 15px;
+          width: 15px; height: 15px;
           border: 2px solid rgba(255,255,255,0.25);
           border-top-color: #fff;
           border-radius: 50%;
@@ -451,19 +433,14 @@ function LoginForm() {
         .footer-note {
           text-align: center;
           font-size: 0.78rem;
-          color: rgba(100,116,139,0.6);
+          color: var(--login-subtext);
           margin: 0;
           animation: riseIn 0.45s 0.2s cubic-bezier(0.22,1,0.36,1) both;
         }
 
+        /* ── Responsive ── */
         @media (max-width: 768px) {
-          .card { 
-            padding: 2.25rem 2rem 1.95rem;
-            border-radius: 20px;
-            gap: 1.4rem;
-            max-width: 100%;
-          }
-          .logo-row { gap: 10px; }
+          .card { padding: 2.25rem 2rem 1.95rem; border-radius: 20px; gap: 1.4rem; max-width: 100%; }
           .logo-mark { width: 40px; height: 40px; }
           .logo-name { font-size: 0.95rem; }
           .logo-tag { font-size: 0.55rem; letter-spacing: 2px; }
@@ -481,80 +458,40 @@ function LoginForm() {
           .footer-note { font-size: 0.75rem; }
         }
         @media (max-width: 640px) {
-          .login-page { padding: 1rem; }
-          .card { 
-            padding: 2rem 1.75rem 1.75rem;
-            border-radius: 18px;
-            gap: 1.2rem;
-            width: 100%;
-          }
-          .logo-row { gap: 8px; }
+          .card { padding: 2rem 1.75rem 1.75rem; border-radius: 18px; gap: 1.2rem; width: 100%; }
           .logo-mark { width: 36px; height: 36px; }
           .logo-name { font-size: 0.9rem; }
           .logo-tag { font-size: 0.52rem; }
           .heading h1 { font-size: clamp(1.3rem, 1.8vw, 1.5rem); margin-bottom: 3px; }
           .heading p { font-size: 0.77rem; }
-          .error-box { 
-            font-size: 0.75rem; 
-            padding: 10px 12px;
-            gap: 7px;
-            border-radius: 8px;
-          }
-          .form { gap: 0.9rem; margin-top: 0.1rem; }
-          .field { gap: 5px; }
-          .field label { font-size: 0.7rem; letter-spacing: 0.3px; }
-          .input-wrap input { 
-            padding: 0.7rem 0.9rem 0.7rem 2.3rem; 
-            font-size: 0.85rem; 
-            border-radius: 10px;
-          }
+          .error-box { font-size: 0.75rem; padding: 10px 12px; gap: 7px; border-radius: 8px; }
+          .form { gap: 0.9rem; }
+          .field label { font-size: 0.7rem; }
+          .input-wrap input { padding: 0.7rem 0.9rem 0.7rem 2.3rem; font-size: 0.85rem; }
           .field-icon { left: 11px; width: 13px; height: 13px; }
           .eye-btn { right: 9px; padding: 3px; }
-          .btn-submit { 
-            padding: 0.75rem;
-            border-radius: 10px;
-            margin-top: 0.2rem;
-          }
+          .btn-submit { padding: 0.75rem; border-radius: 10px; }
           .btn-content { font-size: 0.82rem; gap: 6px; }
           .spinner { width: 12px; height: 12px; border-width: 1.5px; }
-          .footer-note { font-size: 0.72rem; margin-top: 0.25rem; }
-          .g1 { width: 400px; height: 400px; top: -150px; right: -100px; }
-          .g2 { width: 350px; height: 350px; bottom: -100px; left: -80px; }
-          .g3 { width: 250px; height: 250px; }
+          .footer-note { font-size: 0.72rem; }
         }
         @media (max-width: 480px) {
-          .login-page { padding: 0.75rem; }
-          .card { 
-            padding: 1.75rem 1.5rem 1.5rem;
-            border-radius: 16px;
-            gap: 1rem;
-          }
-          .logo-row { gap: 7px; }
+          .card { padding: 1.75rem 1.5rem 1.5rem; border-radius: 16px; gap: 1rem; }
           .logo-mark { width: 34px; height: 34px; border-radius: 10px; }
           .logo-name { font-size: 0.85rem; }
           .logo-tag { font-size: 0.5rem; letter-spacing: 1.5px; }
           .heading h1 { font-size: 1.3rem; }
           .heading p { font-size: 0.75rem; }
-          .error-box { 
-            font-size: 0.72rem; 
-            padding: 9px 11px;
-            gap: 6px;
-          }
+          .error-box { font-size: 0.72rem; padding: 9px 11px; gap: 6px; }
           .form { gap: 0.85rem; }
           .field label { font-size: 0.68rem; }
-          .input-wrap input { 
-            padding: 0.65rem 0.85rem 0.65rem 2.2rem;
-            font-size: 0.82rem;
-          }
+          .input-wrap input { padding: 0.65rem 0.85rem 0.65rem 2.2rem; font-size: 0.82rem; }
           .field-icon { left: 10px; width: 12px; height: 12px; }
           .eye-btn { right: 8px; padding: 2px; }
           .btn-submit { padding: 0.7rem; }
           .btn-content { font-size: 0.8rem; gap: 5px; }
           .spinner { width: 11px; height: 11px; }
           .footer-note { font-size: 0.7rem; }
-          .g1 { width: 300px; height: 300px; }
-          .g2 { width: 250px; height: 250px; }
-          .g3 { width: 200px; height: 200px; }
         }
         @media (max-width: 400px) {
           .card { padding: 1.5rem 1.25rem; border-radius: 14px; gap: 0.9rem; }
@@ -564,11 +501,6 @@ function LoginForm() {
           .btn-submit { padding: 0.65rem; }
           .btn-content { font-size: 0.78rem; }
         }
-
-        @media (max-width: 460px) {
-          .card { padding: 2.25rem 1.5rem 2rem; border-radius: 20px; }
-          .heading h1 { font-size: 1.45rem; }
-        }
       `}</style>
     </div>
   );
@@ -577,7 +509,6 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <div className="login-page">
-      {/* Layered background */}
       <div className="bg-base" />
       <div className="bg-grid" />
       <div className="bg-glow g1" />
@@ -587,7 +518,7 @@ export default function LoginPage() {
       <Suspense fallback={
         <div style={{
           width: 420, maxWidth: "100%",
-          background: "rgba(9,14,27,0.97)",
+          background: "var(--login-card-bg)",
           borderRadius: 24,
           padding: "2.75rem 2.5rem",
           display: "flex", alignItems: "center", justifyContent: "center",
@@ -607,7 +538,28 @@ export default function LoginPage() {
       </Suspense>
 
       <style jsx>{`
+        /* ── CSS Variables: Dark mode (default) ── */
         .login-page {
+          --login-card-bg:          linear-gradient(160deg, rgba(17,24,39,0.97) 0%, rgba(9,14,27,0.99) 100%);
+          --login-card-shadow:
+            0 0 0 1px rgba(99,102,241,0.12),
+            0 32px 80px rgba(0,0,0,0.5),
+            0 8px 24px rgba(0,0,0,0.3),
+            inset 0 1px 0 rgba(255,255,255,0.04);
+          --login-card-border:      linear-gradient(135deg, rgba(129,140,248,0.5) 0%, rgba(34,211,238,0.15) 40%, rgba(99,102,241,0.05) 60%, rgba(129,140,248,0.3) 100%);
+          --login-logo-name:        #e2e8f0;
+          --login-heading:          #f1f5f9;
+          --login-subtext:          rgba(148,163,184,0.75);
+          --login-label:            rgba(148,163,184,0.7);
+          --login-icon:             rgba(100,116,139,0.7);
+          --login-placeholder:      rgba(100,116,139,0.5);
+          --login-input-bg:         rgba(15,23,42,0.6);
+          --login-input-bg-focus:   rgba(15,23,42,0.8);
+          --login-input-border:     rgba(51,65,85,0.7);
+          --login-input-text:       #e2e8f0;
+          --login-page-bg:          #06090f;
+          --login-grid-dot:         rgba(129,140,248,0.06);
+
           min-height: 100vh;
           display: flex;
           align-items: center;
@@ -617,12 +569,36 @@ export default function LoginPage() {
           overflow: hidden;
         }
 
+        /* ── CSS Variables: Light mode override ── */
+        :global(.light) .login-page {
+          --login-card-bg:          linear-gradient(160deg, rgba(255,255,255,0.98) 0%, rgba(248,250,252,0.99) 100%);
+          --login-card-shadow:
+            0 0 0 1px rgba(99,102,241,0.12),
+            0 32px 80px rgba(0,0,0,0.1),
+            0 8px 24px rgba(0,0,0,0.06),
+            inset 0 1px 0 rgba(255,255,255,0.8);
+          --login-card-border:      linear-gradient(135deg, rgba(99,102,241,0.3) 0%, rgba(34,211,238,0.1) 40%, rgba(99,102,241,0.05) 60%, rgba(99,102,241,0.2) 100%);
+          --login-logo-name:        #0f172a;
+          --login-heading:          #0f172a;
+          --login-subtext:          #64748b;
+          --login-label:            #64748b;
+          --login-icon:             #94a3b8;
+          --login-placeholder:      #cbd5e1;
+          --login-input-bg:         rgba(241,245,249,0.8);
+          --login-input-bg-focus:   rgba(255,255,255,0.95);
+          --login-input-border:     rgba(203,213,225,0.8);
+          --login-input-text:       #0f172a;
+          --login-page-bg:          #f1f5f9;
+          --login-grid-dot:         rgba(99,102,241,0.06);
+        }
+
         /* Deep dark base */
         .bg-base {
           position: fixed;
           inset: 0;
-          background: #06090f;
+          background: var(--login-page-bg);
           z-index: 0;
+          transition: background 0.3s ease;
         }
 
         /* Subtle dot grid */
@@ -630,7 +606,7 @@ export default function LoginPage() {
           position: fixed;
           inset: 0;
           z-index: 0;
-          background-image: radial-gradient(rgba(129,140,248,0.06) 1px, transparent 1px);
+          background-image: radial-gradient(var(--login-grid-dot) 1px, transparent 1px);
           background-size: 28px 28px;
           mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
         }
@@ -660,17 +636,16 @@ export default function LoginPage() {
           background: radial-gradient(circle, rgba(139,92,246,0.08), transparent 65%);
           top: 40%; left: 50%;
           transform: translate(-50%, -50%);
-          animation: drift 10s ease-in-out infinite alternate;
         }
         @keyframes drift {
           from { transform: translate(0, 0); }
           to   { transform: translate(30px, 20px); }
         }
-        .g3 { animation-name: drift3; }
         @keyframes drift3 {
           from { transform: translate(-50%, -50%) scale(1); }
           to   { transform: translate(-50%, -50%) scale(1.15); }
         }
+        .g3 { animation: drift3 10s ease-in-out infinite alternate; }
       `}</style>
     </div>
   );
