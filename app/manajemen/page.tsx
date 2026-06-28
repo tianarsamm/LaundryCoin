@@ -18,9 +18,6 @@ interface Karyawan {
   last_login: string | null;
 }
 
-// (removed unused MOCK sample data)
-
-// Supabase row type for users table
 type SupabaseUserRow = {
   id: string;
   username: string;
@@ -202,7 +199,7 @@ function ModalKaryawan({
         .modal-header { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; }
         .modal-title-wrap { display:flex; align-items:center; gap:12px; }
         .modal-icon { width:42px; height:42px; background:rgba(99,102,241,0.12); border:1px solid rgba(99,102,241,0.2); border-radius:11px; display:flex; align-items:center; justify-content:center; color:var(--color-primary); flex-shrink:0; }
-        .modal-header h2 { font-family:var(--font-display); font-size:1.15rem; font-weight:800; color:#fff; margin:0 0 3px; }
+        .modal-header h2 { font-family:var(--font-display); font-size:1.15rem; font-weight:800; color:var(--color-text); margin:0 0 3px; }
         .modal-header p { font-size:0.8rem; color:var(--color-text-muted); margin:0; }
         .modal-form { display:flex; flex-direction:column; gap:1rem; }
         .field { display:flex; flex-direction:column; gap:5px; flex:1; min-width:0; }
@@ -261,7 +258,7 @@ function ModalHapus({ karyawan, onClose, onConfirm }: { karyawan: Karyawan; onCl
         .modal-card { width:100%; max-width:380px; padding:2rem; display:flex; flex-direction:column; align-items:center; gap:1rem; text-align:center; animation:slideUp 0.2s; }
         @keyframes slideUp { from { transform:translateY(16px); opacity:0; } to { transform:translateY(0); opacity:1; } }
         .hapus-icon { width:60px; height:60px; background:rgba(244,63,94,0.1); border:1px solid rgba(244,63,94,0.2); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#f43f5e; }
-        h2 { font-family:var(--font-display); font-size:1.2rem; font-weight:800; color:#fff; margin:0; }
+        h2 { font-family:var(--font-display); font-size:1.2rem; font-weight:800; color:var(--color-text); margin:0; }
         p { font-size:0.875rem; color:var(--color-text-muted); margin:0; line-height:1.5; }
         p strong { color:var(--color-text); }
         .hapus-actions { display:flex; gap:0.75rem; width:100%; margin-top:0.5rem; }
@@ -284,7 +281,6 @@ export default function ManajemenKaryawanPage() {
   const [modalEdit, setModalEdit] = useState<Karyawan | null>(null);
   const [modalHapus, setModalHapus] = useState<Karyawan | null>(null);
 
-  // Ambil data karyawan (yang berrole admin)
   const fetchKaryawan = async () => {
     try {
       const { data, error } = await supabase
@@ -328,36 +324,18 @@ export default function ManajemenKaryawanPage() {
       k.role.includes(search.toLowerCase())
   );
 
-  // ── NAVIGASI KE HALAMAN GAJI ─────────────────────────────────
-  // Simpan data karyawan ke sessionStorage supaya GajiPage bisa
-  // membacanya tanpa perlu fetch ulang / props drilling.
   const handleKelolahGaji = (k: Karyawan) => {
     sessionStorage.setItem(
       `karyawan_${k.id}`,
-      JSON.stringify({
-        id:       k.id,
-        nama:     k.nama,
-        role:     ROLE_LABEL[k.role],
-        nomor_wa: k.nomor_wa,
-        email:    k.email,
-      })
+      JSON.stringify({ id: k.id, nama: k.nama, role: ROLE_LABEL[k.role], nomor_wa: k.nomor_wa, email: k.email })
     );
     router.push(`/manajemen/gaji?id=${k.id}`);
   };
 
-  // ── NAVIGASI KE HALAMAN RIWAYAT ABSENSI ─────────────────────────
-  // Simpan data karyawan ke sessionStorage supaya halaman Riwayat bisa
-  // membacanya dan menampilkan riwayat untuk karyawan yang dipilih.
   const handleLihatRiwayat = (k: Karyawan) => {
     sessionStorage.setItem(
       `karyawan_${k.id}`,
-      JSON.stringify({
-        id:       k.id,
-        nama:     k.nama,
-        role:     ROLE_LABEL[k.role],
-        nomor_wa: k.nomor_wa,
-        email:    k.email,
-      })
+      JSON.stringify({ id: k.id, nama: k.nama, role: ROLE_LABEL[k.role], nomor_wa: k.nomor_wa, email: k.email })
     );
     router.push(`/manajemen/riwayat?id=${k.id}`);
   };
@@ -367,27 +345,13 @@ export default function ManajemenKaryawanPage() {
       const res = await fetch("/api/karyawan", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email: data.email,
-          username: data.username,
-          password: data.password,
-          nama: data.nama,
-          no_hp: data.nomor_wa,
-          role: data.role,
-        }),
+        body: JSON.stringify({ email: data.email, username: data.username, password: data.password, nama: data.nama, no_hp: data.nomor_wa, role: data.role }),
       });
-
       const json = await res.json();
-      if (!json?.success) {
-        alert("Gagal membuat karyawan: " + (json?.error ?? "server error"));
-        return;
-      }
+      if (!json?.success) { alert("Gagal membuat karyawan: " + (json?.error ?? "server error")); return; }
       await fetchKaryawan();
       setModalAdd(false);
-    } catch (err) {
-      console.error(err);
-      alert("Terjadi kesalahan saat membuat karyawan.");
-    }
+    } catch (err) { console.error(err); alert("Terjadi kesalahan saat membuat karyawan."); }
   };
 
   const handleEdit = async (data: Partial<Karyawan> & { password?: string }) => {
@@ -500,22 +464,13 @@ export default function ManajemenKaryawanPage() {
                       {k.is_active ? "Aktif" : "Nonaktif"}
                     </span>
                   </td>
-                  {/* ── TOMBOL KELOLA GAJI — pakai handleKelolahGaji ── */}
                   <td className="td-center">
-                    <button
-                      className="action-btn action-money"
-                      title={`Kelola Gaji ${k.nama}`}
-                      onClick={() => handleKelolahGaji(k)}
-                    >
+                    <button className="action-btn action-money" title={`Kelola Gaji ${k.nama}`} onClick={() => handleKelolahGaji(k)}>
                       <IconMoney />
                     </button>
                   </td>
                   <td className="td-center">
-                    <button
-                      className="action-btn action-cal"
-                      title="Riwayat Absensi"
-                      onClick={() => handleLihatRiwayat(k)}
-                    >
+                    <button className="action-btn action-cal" title="Riwayat Absensi" onClick={() => handleLihatRiwayat(k)}>
                       <IconCal />
                     </button>
                   </td>
@@ -539,13 +494,13 @@ export default function ManajemenKaryawanPage() {
       <style jsx>{`
         .page { padding:2rem; display:flex; flex-direction:column; gap:1.5rem; max-width:1200px; margin:0 auto; }
         .page-header { display:flex; align-items:flex-start; justify-content:space-between; gap:1rem; flex-wrap:wrap; }
-        .page-header h1 { font-family:var(--font-display); font-size:1.65rem; font-weight:800; color:#fff; margin:0 0 4px; letter-spacing:-0.4px; }
+        .page-header h1 { font-family:var(--font-display); font-size:1.65rem; font-weight:800; color:var(--color-text); margin:0 0 4px; letter-spacing:-0.4px; }
         .page-header p { font-size:0.875rem; color:var(--color-text-muted); margin:0; }
         .btn-add { display:flex; align-items:center; gap:8px; padding:0.7rem 1.3rem; background:var(--color-primary); border:none; border-radius:var(--radius-sm); color:#fff; font-weight:700; font-size:0.875rem; cursor:pointer; transition:all 0.2s; box-shadow:0 4px 16px rgba(99,102,241,0.3); white-space:nowrap; }
         .btn-add:hover { background:#4f46e5; transform:translateY(-1px); }
         .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; }
         .stat-card { padding:1.2rem 1.5rem; display:flex; flex-direction:column; gap:4px; }
-        .stat-num { font-family:var(--font-display); font-size:1.8rem; font-weight:800; color:#fff; }
+        .stat-num { font-family:var(--font-display); font-size:1.8rem; font-weight:800; color:var(--color-text); }
         .stat-num.stat-green { color:#4ade80; }
         .stat-num.stat-red   { color:#f87171; }
         .stat-num.stat-blue  { color:#60a5fa; }

@@ -52,6 +52,31 @@
   --nav-height:        68px;
 }
 
+/* ── Light Mode Override ─────────────────────────────────── */
+.light {
+  --color-bg:           #f8fafc;
+  --color-bg-alt:       #f1f5f9;
+  --color-surface:      rgba(255, 255, 255, 0.85);
+  --color-surface-2:    rgba(241, 245, 249, 0.8);
+  --color-border:       rgba(0, 0, 0, 0.08);
+  --color-border-hover: rgba(99, 102, 241, 0.3);
+
+  --color-text:         #0f172a;
+  --color-text-muted:   #64748b;
+
+  --shadow:             0 20px 40px rgba(0, 0, 0, 0.08);
+  --shadow-sm:          0 8px 24px rgba(0, 0, 0, 0.06);
+  --shadow-glow:        0 0 25px rgba(99, 102, 241, 0.15);
+
+  /* Brand tetap sama */
+  --color-primary:      #6366f1;
+  --color-primary-dim:  #818cf8;
+  --color-primary-glow: rgba(99, 102, 241, 0.12);
+
+   --color-success:     #059669;  
+  --color-danger:      #e11d48;
+}
+
 html,
 body {
   min-height: 100%;
@@ -67,6 +92,7 @@ body {
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  transition: background-color 0.3s ease, color 0.3s ease; /* ← tambah ini saja */
 }
 
 body {

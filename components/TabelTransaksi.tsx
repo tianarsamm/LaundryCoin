@@ -37,49 +37,27 @@ export default function TabelTransaksi({ mode, items, onDelete }: TabelTransaksi
                   <td className="date-cell">{formatTanggalPendek(item.tanggal)}</td>
                   <td>
                     {mode === "pemasukan" ? (
-                      isPemasukan(item) ? (
-                        <span className="badge badge--primary">{item.layananUtama}</span>
-                      ) : (
-                        "-"
-                      )
-                    ) : isPemasukan(item) ? (
-                      "-"
-                    ) : (
+                      isPemasukan(item) ? <span className="badge badge--primary">{item.layananUtama}</span> : "-"
+                    ) : isPemasukan(item) ? "-" : (
                       <span className="badge badge--warning">{item.kategori}</span>
                     )}
                   </td>
                   <td className="meta-cell">
                     {mode === "pemasukan" ? (
-                      isPemasukan(item) ? (
-                        <span className="method-tag">{item.metodePembayaran}</span>
-                      ) : (
-                        "-"
-                      )
-                    ) : isPemasukan(item) ? (
-                      "-"
-                    ) : (
+                      isPemasukan(item) ? <span className="method-tag">{item.metodePembayaran}</span> : "-"
+                    ) : isPemasukan(item) ? "-" : (
                       item.keterangan || <span className="no-desc">Tanpa keterangan</span>
                     )}
                   </td>
                   <td className="numeric total-cell">
                     {mode === "pemasukan" ? (
-                      <span className="value-pemasukan">
-                        +{formatRupiah(isPemasukan(item) ? item.totalPembayaran : 0)}
-                      </span>
+                      <span className="value-pemasukan">+{formatRupiah(isPemasukan(item) ? item.totalPembayaran : 0)}</span>
                     ) : (
-                      <span className="value-pengeluaran">
-                        -{formatRupiah(isPemasukan(item) ? 0 : item.jumlah)}
-                      </span>
+                      <span className="value-pengeluaran">-{formatRupiah(isPemasukan(item) ? 0 : item.jumlah)}</span>
                     )}
                   </td>
                   <td className="action-col">
-                    <button
-                      type="button"
-                      className="delete-button"
-                      onClick={() => onDelete(item.id)}
-                    >
-                      Hapus
-                    </button>
+                    <button type="button" className="delete-button" onClick={() => onDelete(item.id)}>Hapus</button>
                   </td>
                 </tr>
               ))}
@@ -89,26 +67,15 @@ export default function TabelTransaksi({ mode, items, onDelete }: TabelTransaksi
       )}
 
       <style jsx>{`
-        .table-wrap {
-          width: 100%;
-        }
+        .table-wrap { width: 100%; }
+        .table-scroll { overflow-x: auto; scrollbar-width: thin; }
+        .table-transaksi { width: 100%; border-collapse: collapse; min-width: 600px; }
 
-        .table-scroll {
-          overflow-x: auto;
-          scrollbar-width: thin;
-        }
-
-        .table-transaksi {
-          width: 100%;
-          border-collapse: collapse;
-          min-width: 600px;
-        }
-
-        th,
-        td {
+        /* ✅ FIX: th/td pakai var */
+        th, td {
           padding: 14px 16px;
           text-align: left;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          border-bottom: 1px solid var(--color-border);
           color: var(--color-text);
           font-size: 0.9rem;
         }
@@ -120,56 +87,32 @@ export default function TabelTransaksi({ mode, items, onDelete }: TabelTransaksi
           font-weight: 800;
           text-transform: uppercase;
           letter-spacing: 1.5px;
-          border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+          border-bottom: 2px solid var(--color-border);
           padding-bottom: 10px;
         }
 
-        tbody tr {
-          background: transparent;
-          transition: all 0.2s ease;
-        }
+        tbody tr { background: transparent; transition: all 0.2s ease; }
+        /* ✅ FIX: hover pakai var */
+        tbody tr:hover { background: var(--color-surface-2); }
 
-        tbody tr:hover {
-          background: rgba(255, 255, 255, 0.02);
-        }
+        .date-cell { font-weight: 500; color: var(--color-text-muted); }
 
-        .date-cell {
-          font-weight: 500;
-          color: var(--color-text-muted);
-        }
-
+        /* ✅ FIX: meta-cell pakai var */
         .meta-cell {
-          color: #e2e8f0;
+          color: var(--color-text);
           max-width: 180px;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
 
-        .no-desc {
-          color: var(--color-text-muted);
-          font-style: italic;
-          font-size: 0.85rem;
-        }
+        .no-desc { color: var(--color-text-muted); font-style: italic; font-size: 0.85rem; }
+        .numeric { text-align: right; }
+        .total-cell { font-family: var(--font-display); font-weight: 700; }
 
-        .numeric {
-          text-align: right;
-        }
+        .value-pemasukan  { color: var(--color-success); }
+        .value-pengeluaran { color: var(--color-danger); }
 
-        .total-cell {
-          font-family: var(--font-display);
-          font-weight: 700;
-        }
-
-        .value-pemasukan {
-          color: var(--color-success);
-        }
-
-        .value-pengeluaran {
-          color: var(--color-danger);
-        }
-
-        /* Badge and Tags */
         .badge {
           display: inline-block;
           padding: 4px 10px;
@@ -177,32 +120,28 @@ export default function TabelTransaksi({ mode, items, onDelete }: TabelTransaksi
           font-size: 0.8rem;
           font-weight: 600;
         }
-
         .badge--primary {
           background: rgba(99, 102, 241, 0.12);
           color: var(--color-primary-dim);
           border: 1px solid rgba(99, 102, 241, 0.15);
         }
-
         .badge--warning {
           background: rgba(245, 158, 11, 0.12);
           color: var(--color-warning);
           border: 1px solid rgba(245, 158, 11, 0.15);
         }
 
+        /* ✅ FIX: method-tag pakai var */
         .method-tag {
           font-size: 0.82rem;
-          color: #94a3b8;
-          background: rgba(255, 255, 255, 0.04);
+          color: var(--color-text-muted);
+          background: var(--color-surface-2);
           padding: 3px 8px;
           border-radius: 4px;
-          border: 1px solid rgba(255, 255, 255, 0.06);
+          border: 1px solid var(--color-border);
         }
 
-        .action-col {
-          text-align: right;
-          width: 80px;
-        }
+        .action-col { text-align: right; width: 80px; }
 
         .delete-button {
           font-size: 0.78rem;
@@ -214,7 +153,6 @@ export default function TabelTransaksi({ mode, items, onDelete }: TabelTransaksi
           padding: 6px 12px;
           transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
-
         .delete-button:hover {
           background: var(--color-danger);
           color: #ffffff;
@@ -222,13 +160,14 @@ export default function TabelTransaksi({ mode, items, onDelete }: TabelTransaksi
           transform: translateY(-1px);
         }
 
+        /* ✅ FIX: empty state pakai var */
         .empty-state {
           padding: 2.5rem 1rem;
           color: var(--color-text-muted);
           text-align: center;
-          border: 1px dashed rgba(255, 255, 255, 0.1);
+          border: 1px dashed var(--color-border);
           border-radius: var(--radius);
-          background: rgba(255, 255, 255, 0.01);
+          background: var(--color-surface-2);
         }
       `}</style>
     </div>

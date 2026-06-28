@@ -22,36 +22,21 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
   const [tanggal, setTanggal] = useState(getTanggalHariIni());
   const [layananUtama, setLayananUtama] = useState(LIST_LAYANAN_UTAMA[0]);
   const [layananTambahan, setLayananTambahan] = useState<LayananTambahan[]>([]);
-  const [metodePembayaran, setMetodePembayaran] = useState<MetodePembayaran>(
-    LIST_METODE_PEMBAYARAN[0]
-  );
+  const [metodePembayaran, setMetodePembayaran] = useState<MetodePembayaran>(LIST_METODE_PEMBAYARAN[0]);
 
   const hargaLayanan = HARGA_LAYANAN_UTAMA[layananUtama];
-  const hargaTambahan = layananTambahan.reduce(
-    (sum, item) => sum + HARGA_LAYANAN_TAMBAHAN[item],
-    0
-  );
+  const hargaTambahan = layananTambahan.reduce((sum, item) => sum + HARGA_LAYANAN_TAMBAHAN[item], 0);
   const totalPembayaran = hargaLayanan + hargaTambahan;
 
   const handleToggleTambahan = (item: LayananTambahan) => {
     setLayananTambahan((current) =>
-      current.includes(item)
-        ? current.filter((value) => value !== item)
-        : [...current, item]
+      current.includes(item) ? current.filter((v) => v !== item) : [...current, item]
     );
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    addPemasukan({
-      tanggal,
-      layananUtama,
-      layananTambahan,
-      hargaLayanan,
-      hargaTambahan,
-      totalPembayaran,
-      metodePembayaran,
-    });
+    addPemasukan({ tanggal, layananUtama, layananTambahan, hargaLayanan, hargaTambahan, totalPembayaran, metodePembayaran });
     setTanggal(getTanggalHariIni());
     setLayananUtama(LIST_LAYANAN_UTAMA[0]);
     setLayananTambahan([]);
@@ -61,34 +46,20 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
 
   return (
     <div className="form-pemasukan">
+      {/* ✅ FIX: pakai var(--color-text) */}
       <h2>Catat Pemasukan</h2>
       <form onSubmit={handleSubmit} className="form-grid">
         <label className="field">
           <span>Tanggal Transaksi</span>
-          <input
-            type="date"
-            value={tanggal}
-            onChange={(event) => setTanggal(event.target.value)}
-          />
+          <input type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)} />
         </label>
 
         <label className="field">
           <span>Layanan Utama</span>
-          <select
-            value={layananUtama}
-            onChange={(event) =>
-              setLayananUtama(event.target.value as typeof layananUtama)
-            }
-          >
-            {LIST_LAYANAN_UTAMA.map((layanan) => (
-              <option key={layanan} value={layanan}>
-                {layanan}
-              </option>
-            ))}
+          <select value={layananUtama} onChange={(e) => setLayananUtama(e.target.value as typeof layananUtama)}>
+            {LIST_LAYANAN_UTAMA.map((l) => <option key={l} value={l}>{l}</option>)}
           </select>
-          <small className="help-text">
-            * Layanan: {DESKRIPSI_LAYANAN_UTAMA[layananUtama]}
-          </small>
+          <small className="help-text">* Layanan: {DESKRIPSI_LAYANAN_UTAMA[layananUtama]}</small>
         </label>
 
         <div className="field field--checkbox-group">
@@ -97,12 +68,7 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
             {LIST_LAYANAN_TAMBAHAN.map((item) => {
               const isChecked = layananTambahan.includes(item);
               return (
-                <button
-                  key={item}
-                  type="button"
-                  className={`checkbox-chip ${isChecked ? "checked" : ""}`}
-                  onClick={() => handleToggleTambahan(item)}
-                >
+                <button key={item} type="button" className={`checkbox-chip ${isChecked ? "checked" : ""}`} onClick={() => handleToggleTambahan(item)}>
                   <span className="chip-indicator" />
                   {item}
                 </button>
@@ -113,17 +79,8 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
 
         <label className="field">
           <span>Metode Pembayaran</span>
-          <select
-            value={metodePembayaran}
-            onChange={(event) =>
-              setMetodePembayaran(event.target.value as MetodePembayaran)
-            }
-          >
-            {LIST_METODE_PEMBAYARAN.map((method) => (
-              <option key={method} value={method}>
-                {method}
-              </option>
-            ))}
+          <select value={metodePembayaran} onChange={(e) => setMetodePembayaran(e.target.value as MetodePembayaran)}>
+            {LIST_METODE_PEMBAYARAN.map((m) => <option key={m} value={m}>{m}</option>)}
           </select>
         </label>
 
@@ -153,34 +110,23 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           display: flex;
           flex-direction: column;
           gap: 1.25rem;
-          /* Pastikan tidak overflow container */
           min-width: 0;
           width: 100%;
         }
 
+        /* ✅ FIX: pakai var */
         .form-pemasukan h2 {
           margin: 0;
           font-family: var(--font-display);
           font-size: 1.25rem;
           font-weight: 700;
-          color: #ffffff;
+          color: var(--color-text);
           letter-spacing: -0.2px;
         }
 
-        .form-grid {
-          display: grid;
-          gap: 1.25rem;
-          /* Kritis: cegah overflow ke luar */
-          min-width: 0;
-          width: 100%;
-        }
+        .form-grid { display: grid; gap: 1.25rem; min-width: 0; width: 100%; }
 
-        .field {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-          min-width: 0;
-        }
+        .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 
         .field span {
           font-family: var(--font-body);
@@ -191,20 +137,19 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           letter-spacing: 0.8px;
         }
 
+        /* ✅ FIX: input/select pakai var — tidak lagi rgba putih hardcoded */
         .field input,
         .field select {
-          /* width: 100% + box-sizing agar tidak meluap */
           width: 100%;
           box-sizing: border-box;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          color: #ffffff;
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
+          color: var(--color-text);
           border-radius: var(--radius-sm);
           padding: 12px 14px;
           outline: none;
           transition: all 0.25s ease;
           appearance: none;
-          /* Cegah teks meluap */
           overflow: hidden;
           text-overflow: ellipsis;
           white-space: nowrap;
@@ -217,16 +162,17 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           padding-right: 40px;
         }
 
+        /* ✅ FIX: option pakai var */
         .field select option {
-          background: #0d1322;
-          color: #ffffff;
+          background: var(--color-bg-alt, #0d1322);
+          color: var(--color-text);
         }
 
         .field input:focus,
         .field select:focus {
           border-color: var(--color-primary-dim);
           box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
-          background: rgba(255, 255, 255, 0.04);
+          background: var(--color-surface);
         }
 
         .help-text {
@@ -234,34 +180,31 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           font-size: 0.78rem;
           font-weight: 500;
           margin-top: 2px;
-          /* Bungkus teks panjang */
           word-break: break-word;
           white-space: normal;
         }
 
-        /* Checkbox chips */
         .field--checkbox-group .checkbox-grid {
           display: grid;
           gap: 10px;
-          /* Selalu 1 kolom agar tidak terpotong */
           grid-template-columns: 1fr;
         }
 
+        /* ✅ FIX: chip pakai var */
         .checkbox-chip {
           display: flex;
           align-items: center;
           gap: 12px;
-          border: 1px solid rgba(255, 255, 255, 0.06);
+          border: 1px solid var(--color-border);
           border-radius: 10px;
           padding: 12px 14px;
-          background: rgba(255, 255, 255, 0.02);
+          background: var(--color-surface-2);
           color: var(--color-text-muted);
           text-align: left;
           font-size: 0.88rem;
           font-weight: 500;
           cursor: pointer;
           transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-          /* Cegah overflow */
           width: 100%;
           box-sizing: border-box;
           min-width: 0;
@@ -270,23 +213,22 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
 
         .chip-indicator {
           flex-shrink: 0;
-          width: 8px;
-          height: 8px;
+          width: 8px; height: 8px;
           border-radius: 50%;
-          background: rgba(255, 255, 255, 0.1);
+          background: var(--color-border);
           transition: all 0.25s ease;
         }
 
         .checkbox-chip:hover {
-          background: rgba(255, 255, 255, 0.04);
-          color: #ffffff;
-          border-color: rgba(255, 255, 255, 0.12);
+          background: var(--color-surface);
+          color: var(--color-text);
+          border-color: var(--color-border-hover);
         }
 
         .checkbox-chip.checked {
           background: rgba(99, 102, 241, 0.1);
           border-color: var(--color-primary);
-          color: #ffffff;
+          color: var(--color-text);
           box-shadow: 0 0 12px rgba(99, 102, 241, 0.1);
         }
 
@@ -295,16 +237,15 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           box-shadow: 0 0 8px var(--color-primary);
         }
 
-        /* Summary Box */
+        /* ✅ FIX: summary box pakai var */
         .summary-box {
           display: flex;
           flex-direction: column;
           gap: 10px;
           padding: 18px;
           border-radius: 12px;
-          background: rgba(255, 255, 255, 0.01);
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          /* Cegah overflow */
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
           min-width: 0;
           width: 100%;
           box-sizing: border-box;
@@ -319,44 +260,20 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           min-width: 0;
         }
 
-        .summary-row span {
-          color: var(--color-text-muted);
-          font-weight: 500;
-          flex-shrink: 0;
-        }
+        .summary-row span { color: var(--color-text-muted); font-weight: 500; flex-shrink: 0; }
+        .summary-row strong { color: var(--color-text); font-weight: 600; text-align: right; min-width: 0; word-break: break-all; }
 
-        .summary-row strong {
-          color: #ffffff;
-          font-weight: 600;
-          text-align: right;
-          min-width: 0;
-          word-break: break-all;
-        }
+        .summary-divider { height: 1px; background: var(--color-border); margin: 4px 0; }
 
-        .summary-divider {
-          height: 1px;
-          background: rgba(255, 255, 255, 0.05);
-          margin: 4px 0;
-        }
-
-        .summary-total {
-          font-size: 0.95rem;
-        }
-
-        .summary-total span {
-          color: #ffffff;
-          font-weight: 700;
-        }
-
+        .summary-total { font-size: 0.95rem; }
+        .summary-total span { color: var(--color-text); font-weight: 700; }
         .summary-total strong {
           font-family: var(--font-display);
           font-size: 1.15rem;
           font-weight: 800;
           color: var(--color-primary-dim);
-          text-shadow: 0 0 8px rgba(99, 102, 241, 0.2);
         }
 
-        /* Submit Button — kritis: tidak boleh terpotong */
         .submit-button {
           width: 100%;
           box-sizing: border-box;
@@ -368,76 +285,24 @@ export default function FormPemasukan({ onSuccess }: FormPemasukanProps) {
           font-weight: 700;
           transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           box-shadow: 0 4px 20px rgba(99, 102, 241, 0.3);
-          /* Cegah teks terpotong */
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
         }
+        .submit-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45); filter: brightness(1.1); }
+        .submit-button:active { transform: translateY(0); }
 
-        .submit-button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45);
-          filter: brightness(1.1);
-        }
-
-        .submit-button:active {
-          transform: translateY(0);
-        }
-
-        /* Mobile adjustments */
         @media (max-width: 640px) {
-          .form-grid {
-            gap: 1rem;
-          }
-
-          .form-pemasukan h2 {
-            font-size: 1.1rem;
-          }
-
-          .field input,
-          .field select {
-            padding: 10px 12px;
-            font-size: 0.9rem;
-          }
-
-          .field select {
-            padding-right: 36px;
-          }
-
-          .checkbox-chip {
-            padding: 10px 12px;
-            font-size: 0.85rem;
-          }
-
-          .summary-box {
-            padding: 14px;
-          }
-
-          .summary-total strong {
-            font-size: 1rem;
-          }
-
-          .submit-button {
-            padding: 13px 10px;
-            font-size: 0.88rem;
-          }
+          .form-grid { gap: 1rem; }
+          .form-pemasukan h2 { font-size: 1.1rem; }
+          .field input, .field select { padding: 10px 12px; font-size: 0.9rem; }
+          .checkbox-chip { padding: 10px 12px; font-size: 0.85rem; }
+          .summary-box { padding: 14px; }
+          .submit-button { padding: 13px 10px; font-size: 0.88rem; }
         }
-
         @media (max-width: 380px) {
-          .field input,
-          .field select {
-            padding: 9px 10px;
-            font-size: 0.85rem;
-          }
-
-          .summary-total strong {
-            font-size: 0.95rem;
-          }
-
-          .submit-button {
-            font-size: 0.82rem;
-            padding: 12px 8px;
-          }
+          .field input, .field select { padding: 9px 10px; font-size: 0.85rem; }
+          .submit-button { font-size: 0.82rem; padding: 12px 8px; }
         }
       `}</style>
     </div>

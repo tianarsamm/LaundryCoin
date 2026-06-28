@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/supabase/hooks/useAuth";
 import { NotificationBell } from "@/components/NotificationBell";
+import { useTheme } from "@/context/ThemeContext";
 import type { MenuKey } from "@/lib/auth-types";
 
 interface NavItem {
@@ -14,11 +15,33 @@ interface NavItem {
   icon: React.ReactNode;
 }
 
+/* ── Icon helpers ── */
+const SunIcon = ({ size = 18 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/>
+    <line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/>
+    <line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+);
+
+const MoonIcon = ({ size = 18 }: { size?: number }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+  </svg>
+);
+
 export default function Navbar() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, canAccess, signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
 
   useEffect(() => {
     Promise.resolve().then(() => setMenuOpen(false));
@@ -41,12 +64,7 @@ export default function Navbar() {
       label: "Dashboard",
       href: "/dashboard",
       icon: (
-        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          {/* <rect x="3" y="3" width="7" height="9" rx="1" />
-          <rect x="14" y="3" width="7" height="5" rx="1" />
-          <rect x="14" y="12" width="7" height="9" rx="1" />
-          <rect x="3" y="16" width="7" height="5" rx="1" /> */}
-        </svg>
+        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       ),
     },
     {
@@ -54,10 +72,7 @@ export default function Navbar() {
       label: "Absensi",
       href: "/absensi",
       icon: (
-        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          {/* <circle cx="12" cy="12" r="9" />
-          <path d="M12 7v6l4 2" /> */}
-        </svg>
+        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       ),
     },
     {
@@ -65,10 +80,7 @@ export default function Navbar() {
       label: "Izin",
       href: "/izin",
       icon: (
-        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          {/* <path d="M6 7h12M6 11h10M6 15h8" />
-          <path d="M4 5h16v14H4z" /> */}
-        </svg>
+        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       ),
     },
     {
@@ -76,10 +88,7 @@ export default function Navbar() {
       label: "Pemasukan",
       href: "/pemasukan",
       icon: (
-        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          {/* <line x1="12" y1="5" x2="12" y2="19" />
-          <polyline points="19 12 12 19 5 12" /> */}
-        </svg>
+        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       ),
     },
     {
@@ -87,10 +96,7 @@ export default function Navbar() {
       label: "Pengeluaran",
       href: "/pengeluaran",
       icon: (
-        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          {/* <line x1="12" y1="19" x2="12" y2="5" />
-          <polyline points="5 12 12 5 19 12" /> */}
-        </svg>
+        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       ),
     },
     {
@@ -98,11 +104,7 @@ export default function Navbar() {
       label: "Laporan",
       href: "/laporan",
       icon: (
-        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          {/* <line x1="18" y1="20" x2="18" y2="10" />
-          <line x1="12" y1="20" x2="12" y2="4" />
-          <line x1="6" y1="20" x2="6" y2="14" /> */}
-        </svg>
+        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       ),
     },
     {
@@ -110,12 +112,7 @@ export default function Navbar() {
       label: "Manajemen Karyawan",
       href: "/manajemen",
       icon: (
-        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          {/* <circle cx="9" cy="7" r="3" />
-          <path d="M3 20c0-3.3 2.7-6 6-6s6 2.7 6 6" />
-          <path d="M16 3.1a4 4 0 0 1 0 7.8" />
-          <path d="M21 20c0-3.3-2-5.6-5-6.3" /> */}
-        </svg>
+        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       ),
     },
     {
@@ -123,11 +120,7 @@ export default function Navbar() {
       label: "Manajemen Izin",
       href: "/manajemen/izin",
       icon: (
-        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          {/* <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2" />
-          <rect x="9" y="3" width="6" height="4" rx="1" />
-          <path d="M9 12h6M9 16h4" /> */}
-        </svg>
+        <svg className="nav-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       ),
     },
   ];
@@ -163,8 +156,18 @@ export default function Navbar() {
 
           {user && (
             <div className="navbar__right-section">
-              {/* ── Bell Notifikasi ── */}
+              {/* Bell Notifikasi */}
               <NotificationBell />
+
+              {/* Theme Toggle — desktop */}
+              <button
+                className="navbar__theme-btn"
+                onClick={toggleTheme}
+                title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? <SunIcon /> : <MoonIcon />}
+              </button>
 
               <div className="navbar__profile">
                 <div className="navbar__profile-avatar">
@@ -177,7 +180,8 @@ export default function Navbar() {
                   </span>
                 </div>
               </div>
-              <button 
+
+              <button
                 className="navbar__logout-btn"
                 onClick={signOut}
                 aria-label="Logout"
@@ -235,10 +239,21 @@ export default function Navbar() {
 
         <div className="drawer__divider" />
 
-        {/* Bell notifikasi di mobile drawer */}
+        {/* Notif + Theme Toggle row di mobile drawer */}
         <div className="drawer__notif-row">
           <span className="drawer__notif-label">Notifikasi</span>
-          <NotificationBell />
+          <div className="drawer__notif-actions">
+            {/* Theme Toggle — mobile */}
+            <button
+              className="drawer__theme-btn"
+              onClick={toggleTheme}
+              title={theme === "dark" ? "Switch to Light Mode" : "Switch to Dark Mode"}
+              aria-label="Toggle theme"
+            >
+              {theme === "dark" ? <SunIcon size={16} /> : <MoonIcon size={16} />}
+            </button>
+            <NotificationBell />
+          </div>
         </div>
 
         <div className="drawer__divider" />
@@ -258,7 +273,7 @@ export default function Navbar() {
         </ul>
 
         <div className="drawer__footer">
-          <button 
+          <button
             className="drawer__logout-btn"
             onClick={signOut}
             aria-label="Logout"
@@ -285,17 +300,17 @@ export default function Navbar() {
           height: var(--nav-height);
           display: flex;
           align-items: center;
-          background: rgba(9, 13, 22, 0.2);
+          background: var(--color-surface);
           backdrop-filter: blur(100px);
           -webkit-backdrop-filter: blur(100px);
-          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-          box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+          border-bottom: 1px solid var(--color-border);
+          box-shadow: var(--shadow-sm);
           transition: all 0.3s ease;
         }
         .navbar--scrolled {
-          background: rgba(9, 13, 22, 0.85);
+          background: var(--color-surface);
           border-bottom-color: rgba(99, 102, 241, 0.15);
-          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
         }
         .navbar__container {
           width: 100%;
@@ -324,16 +339,13 @@ export default function Navbar() {
         .navbar__brand:hover .navbar__logo-mark { transform: rotate(15deg) scale(1.05); }
         .navbar__title-group { display: flex; flex-direction: column; }
         .navbar__title {
-          font-family: var(--font-display);
-          font-size: 18px;
-          font-weight: 800;
-          letter-spacing: -0.5px;
-          line-height: 1.15;
-          background: linear-gradient(135deg, #ffffff 40%, #c7d2fe);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  line-height: 1.15;
+  color: var(--color-text);
+}
         .navbar__subtitle {
           font-size: 9px;
           color: var(--color-primary-dim);
@@ -364,9 +376,9 @@ export default function Navbar() {
           overflow: hidden;
         }
         .navbar__link :global(.nav-icon) { transition: transform 0.2s ease; }
-        .navbar__link:hover { color: #ffffff; background: rgba(255, 255, 255, 0.04); }
+        .navbar__link:hover { color: var(--color-text); background: var(--color-surface-2); }
         .navbar__link:hover :global(.nav-icon) { transform: translateY(-1px); }
-        .navbar__link--active { background: rgba(99, 102, 241, 0.12); color: #ffffff; }
+        .navbar__link--active { background: rgba(99, 102, 241, 0.12); color: var(--color-text); }
         .navbar__link-indicator {
           position: absolute;
           bottom: 0; left: 50%;
@@ -403,20 +415,42 @@ export default function Navbar() {
           display: flex; flex-direction: column;
           align-items: flex-end; gap: 2px;
         }
-        .navbar__profile-username { font-size: 0.92rem; font-weight: 700; color: #ffffff; }
+        .navbar__profile-username { font-size: 0.92rem; font-weight: 700; color: var(--color-text); }
         .navbar__profile-role {
           font-size: 0.72rem; font-weight: 700;
           color: var(--color-text-muted);
           text-transform: uppercase; letter-spacing: 0.4px;
         }
+
+        /* Theme toggle button — desktop */
+        .navbar__theme-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 40px; height: 40px;
+          border-radius: 10px;
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
+          color: var(--color-text-muted);
+          cursor: pointer;
+          transition: all 0.2s ease;
+          flex-shrink: 0;
+        }
+        .navbar__theme-btn:hover {
+          background: rgba(99, 102, 241, 0.1);
+          border-color: rgba(99, 102, 241, 0.3);
+          color: var(--color-primary);
+          transform: rotate(12deg);
+        }
+
         .navbar__logout-btn {
           display: flex;
           align-items: center;
           justify-content: center;
           width: 40px; height: 40px;
           border-radius: 10px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
           color: var(--color-text-muted);
           cursor: pointer;
           transition: all 0.2s ease;
@@ -436,8 +470,8 @@ export default function Navbar() {
           justify-content: center;
           gap: 5px;
           width: 40px; height: 40px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
           border-radius: 10px;
           cursor: pointer;
           padding: 0 11px;
@@ -445,7 +479,7 @@ export default function Navbar() {
           transition: all 0.2s ease;
         }
         .burger:hover {
-          background: rgba(255, 255, 255, 0.07);
+          background: var(--color-surface);
           border-color: rgba(99, 102, 241, 0.3);
         }
         .burger__line {
@@ -481,11 +515,11 @@ export default function Navbar() {
           top: 0; right: 0; bottom: 0;
           z-index: 300;
           width: min(320px, 85vw);
-          background: rgba(10, 15, 26, 0.85);
+          background: var(--color-surface);
           backdrop-filter: blur(24px);
           -webkit-backdrop-filter: blur(24px);
-          border-left: 1px solid rgba(255, 255, 255, 0.08);
-          box-shadow: -10px 0 40px rgba(0, 0, 0, 0.6);
+          border-left: 1px solid var(--color-border);
+          box-shadow: -10px 0 40px rgba(0, 0, 0, 0.3);
           display: flex; flex-direction: column;
           transform: translateX(100%);
           transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
@@ -500,8 +534,8 @@ export default function Navbar() {
         .drawer__close {
           width: 36px; height: 36px;
           display: flex; align-items: center; justify-content: center;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          background: rgba(255, 255, 255, 0.03);
+          border: 1px solid var(--color-border);
+          background: var(--color-surface-2);
           border-radius: 10px; cursor: pointer;
           color: var(--color-text-muted);
           transition: all 0.2s ease; flex-shrink: 0;
@@ -513,11 +547,11 @@ export default function Navbar() {
         }
         .drawer__divider {
           height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+          background: linear-gradient(90deg, transparent, var(--color-border), transparent);
           margin: 0 1.25rem;
         }
 
-        /* Notif row di mobile drawer */
+        /* Notif + theme row di mobile drawer */
         .drawer__notif-row {
           display: flex;
           align-items: center;
@@ -530,6 +564,31 @@ export default function Navbar() {
           color: var(--color-text-muted);
           text-transform: uppercase;
           letter-spacing: 0.5px;
+        }
+        .drawer__notif-actions {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        /* Theme toggle button — mobile */
+        .drawer__theme-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 34px; height: 34px;
+          border-radius: 8px;
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
+          color: var(--color-text-muted);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+        .drawer__theme-btn:hover {
+          background: rgba(99, 102, 241, 0.1);
+          border-color: rgba(99, 102, 241, 0.3);
+          color: var(--color-primary);
+          transform: rotate(12deg);
         }
 
         .drawer__menu {
@@ -552,9 +611,9 @@ export default function Navbar() {
           text-decoration: none; position: relative;
           transition: all 0.2s ease;
         }
-        .drawer__link:hover { background: rgba(255, 255, 255, 0.04); color: #ffffff; }
+        .drawer__link:hover { background: var(--color-surface-2); color: var(--color-text); }
         .drawer__link--active {
-          background: rgba(99, 102, 241, 0.12); color: #ffffff;
+          background: rgba(99, 102, 241, 0.12); color: var(--color-text);
           box-shadow: inset 0 0 0 1px rgba(99, 102, 241, 0.2);
         }
         .drawer__active-pip {
@@ -566,7 +625,7 @@ export default function Navbar() {
         }
         .drawer__footer {
           padding: 1.5rem 1.25rem;
-          border-top: 1px solid rgba(255, 255, 255, 0.04);
+          border-top: 1px solid var(--color-border);
           display: flex;
           flex-direction: column;
           gap: 1rem;

@@ -21,7 +21,6 @@ export default function LaporanPage() {
   const [totalPengeluaranAll, setTotalPengeluaranAll] = useState(0);
   const [isLive, setIsLive] = useState(false);
 
-  // ── Load total count (all-time) ──────────────────────────────────────────
   const loadCounts = useCallback(async () => {
     const [{ count: pemasukanCount }, { count: pengeluaranCount }] = await Promise.all([
       supabase.from("pemasukan").select("id", { count: "exact", head: true }),
@@ -31,20 +30,11 @@ export default function LaporanPage() {
     setTotalPengeluaranAll(pengeluaranCount ?? 0);
   }, []);
 
-  // ── Load data per rentang tanggal ────────────────────────────────────────
   const loadRange = useCallback(async () => {
     const [{ data: pemasukanData, error: pemasukanError }, { data: pengeluaranData, error: pengeluaranError }] =
       await Promise.all([
-        supabase
-          .from("pemasukan")
-          .select("total_pembayaran, metode_pembayaran")
-          .gte("tanggal", dari)
-          .lte("tanggal", sampai),
-        supabase
-          .from("pengeluaran")
-          .select("jumlah, kategori")
-          .gte("tanggal", dari)
-          .lte("tanggal", sampai),
+        supabase.from("pemasukan").select("total_pembayaran, metode_pembayaran").gte("tanggal", dari).lte("tanggal", sampai),
+        supabase.from("pengeluaran").select("jumlah, kategori").gte("tanggal", dari).lte("tanggal", sampai),
       ]);
 
     if (pemasukanError) console.error("Failed to load pemasukan:", pemasukanError.message);
@@ -56,11 +46,11 @@ export default function LaporanPage() {
     const pemasukanList: PemasukanRow[] = (pemasukanData ?? []) as PemasukanRow[];
     const pengeluaranList: PengeluaranRow[] = (pengeluaranData ?? []) as PengeluaranRow[];
 
-    setPemasukan(pemasukanList.reduce((sum: number, item: PemasukanRow) => sum + (item.total_pembayaran ?? 0), 0));
-    setPengeluaran(pengeluaranList.reduce((sum: number, item: PengeluaranRow) => sum + (item.jumlah ?? 0), 0));
+    setPemasukan(pemasukanList.reduce((sum, item) => sum + (item.total_pembayaran ?? 0), 0));
+    setPengeluaran(pengeluaranList.reduce((sum, item) => sum + (item.jumlah ?? 0), 0));
 
     setMetodeBreakdown(
-      pemasukanList.reduce((acc: Record<string, number>, item: PemasukanRow) => {
+      pemasukanList.reduce((acc: Record<string, number>, item) => {
         const key = item.metode_pembayaran || "unknown";
         acc[key] = (acc[key] ?? 0) + (item.total_pembayaran ?? 0);
         return acc;
@@ -68,7 +58,7 @@ export default function LaporanPage() {
     );
 
     setKategoriBreakdown(
-      pengeluaranList.reduce((acc: Record<string, number>, item: PengeluaranRow) => {
+      pengeluaranList.reduce((acc: Record<string, number>, item) => {
         const key = item.kategori || "unknown";
         acc[key] = (acc[key] ?? 0) + (item.jumlah ?? 0);
         return acc;
@@ -76,72 +66,27 @@ export default function LaporanPage() {
     );
   }, [dari, sampai]);
 
-  // ── Initial load ─────────────────────────────────────────────────────────
-  // FIX 3: gunakan "void" agar ESLint tidak menganggap ini setState sinkron
-  useEffect(() => {
-    Promise.resolve().then(() => loadCounts());
-  }, [loadCounts]);
+  useEffect(() => { Promise.resolve().then(() => loadCounts()); }, [loadCounts]);
+  useEffect(() => { Promise.resolve().then(() => loadRange()); }, [loadRange]);
 
-  useEffect(() => {
-    Promise.resolve().then(() => loadRange());
-  }, [loadRange]);
-
-  // ── Realtime subscriptions ────────────────────────────────────────────────
   useEffect(() => {
     const channel = supabase
       .channel("laporan-realtime")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "pemasukan" },
-        () => {
-          void loadRange();
-          void loadCounts();
-        }
-      )
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "pengeluaran" },
-        () => {
-          void loadRange();
-          void loadCounts();
-        }
-      )
-      // FIX 4: tambah tipe "string" pada parameter status
-      .subscribe((status: string) => {
-        setIsLive(status === "SUBSCRIBED");
-      });
+      .on("postgres_changes", { event: "*", schema: "public", table: "pemasukan" }, () => { void loadRange(); void loadCounts(); })
+      .on("postgres_changes", { event: "*", schema: "public", table: "pengeluaran" }, () => { void loadRange(); void loadCounts(); })
+      .subscribe((status: string) => { setIsLive(status === "SUBSCRIBED"); });
 
-    return () => {
-      supabase.removeChannel(channel);
-      setIsLive(false);
-    };
+    return () => { supabase.removeChannel(channel); setIsLive(false); };
   }, [loadRange, loadCounts]);
 
   const laba = pemasukan - pengeluaran;
-
-  const metodeList = useMemo(
-    () => Object.entries(metodeBreakdown).sort((a, b) => b[1] - a[1]),
-    [metodeBreakdown]
-  );
-
-  const kategoriList = useMemo(
-    () => Object.entries(kategoriBreakdown).sort((a, b) => b[1] - a[1]),
-    [kategoriBreakdown]
-  );
-
-  const totalPemasukanRentang = useMemo(
-    () => metodeList.reduce((sum: number, item: [string, number]) => sum + item[1], 0),
-    [metodeList]
-  );
-
-  const totalPengeluaranRentang = useMemo(
-    () => kategoriList.reduce((sum: number, item: [string, number]) => sum + item[1], 0),
-    [kategoriList]
-  );
+  const metodeList = useMemo(() => Object.entries(metodeBreakdown).sort((a, b) => b[1] - a[1]), [metodeBreakdown]);
+  const kategoriList = useMemo(() => Object.entries(kategoriBreakdown).sort((a, b) => b[1] - a[1]), [kategoriBreakdown]);
+  const totalPemasukanRentang = useMemo(() => metodeList.reduce((sum, item) => sum + item[1], 0), [metodeList]);
+  const totalPengeluaranRentang = useMemo(() => kategoriList.reduce((sum, item) => sum + item[1], 0), [kategoriList]);
 
   return (
     <div className="laporan-page">
-      {/* Decorative background glows */}
       <div className="laporan-bg-glow glow-laporan-1" />
       <div className="laporan-bg-glow glow-laporan-2" />
 
@@ -163,27 +108,16 @@ export default function LaporanPage() {
           <div className="period-card glass-panel">
             <label className="period-label">
               <span>Dari Tanggal</span>
-              <input
-                type="date"
-                value={dari}
-                max={sampai}
-                onChange={(e) => setDari(e.target.value)}
-              />
+              <input type="date" value={dari} max={sampai} onChange={(e) => setDari(e.target.value)} />
             </label>
             <div className="period-connector">sampai</div>
             <label className="period-label">
               <span>Sampai Tanggal</span>
-              <input
-                type="date"
-                value={sampai}
-                min={dari}
-                onChange={(e) => setSampai(e.target.value)}
-              />
+              <input type="date" value={sampai} min={dari} onChange={(e) => setSampai(e.target.value)} />
             </label>
           </div>
         </header>
 
-        {/* Summary Statistics Grid */}
         <section className="summary-grid">
           <article className="summary-card summary-card--income glass-panel">
             <span>Total Pendapatan</span>
@@ -193,15 +127,12 @@ export default function LaporanPage() {
             <span>Total Pengeluaran</span>
             <strong>{formatRupiah(pengeluaran)}</strong>
           </article>
-          <article
-            className={`summary-card ${laba >= 0 ? "summary-card--profit" : "summary-card--loss"} glass-panel`}
-          >
+          <article className={`summary-card ${laba >= 0 ? "summary-card--profit" : "summary-card--loss"} glass-panel`}>
             <span>Estimasi Laba Bersih</span>
             <strong>{formatRupiah(laba)}</strong>
           </article>
         </section>
 
-        {/* Breakdowns section */}
         <section className="breakdown-grid">
           <div className="breakdown-card glass-panel">
             <header className="breakdown-header">
@@ -215,11 +146,7 @@ export default function LaporanPage() {
                 metodeList.map(([name, value], idx) => {
                   const pct = totalPemasukanRentang > 0 ? (value / totalPemasukanRentang) * 100 : 0;
                   return (
-                    <div
-                      key={name}
-                      className="breakdown-item"
-                      style={{ animationDelay: `${idx * 50}ms` }}
-                    >
+                    <div key={name} className="breakdown-item" style={{ animationDelay: `${idx * 50}ms` }}>
                       <div className="breakdown-item__progress" style={{ width: `${pct}%` }} />
                       <span className="breakdown-item__name">{name}</span>
                       <strong className="breakdown-item__value">{formatRupiah(value)}</strong>
@@ -242,15 +169,8 @@ export default function LaporanPage() {
                 kategoriList.map(([name, value], idx) => {
                   const pct = totalPengeluaranRentang > 0 ? (value / totalPengeluaranRentang) * 100 : 0;
                   return (
-                    <div
-                      key={name}
-                      className="breakdown-item"
-                      style={{ animationDelay: `${idx * 50}ms` }}
-                    >
-                      <div
-                        className="breakdown-item__progress breakdown-item__progress--expense"
-                        style={{ width: `${pct}%` }}
-                      />
+                    <div key={name} className="breakdown-item" style={{ animationDelay: `${idx * 50}ms` }}>
+                      <div className="breakdown-item__progress breakdown-item__progress--expense" style={{ width: `${pct}%` }} />
                       <span className="breakdown-item__name">{name}</span>
                       <strong className="breakdown-item__value">{formatRupiah(value)}</strong>
                     </div>
@@ -261,15 +181,11 @@ export default function LaporanPage() {
           </div>
         </section>
 
-        {/* Recap Bar */}
         <section className="traffic-card glass-panel">
           <div className="traffic-icon">📁</div>
           <div>
             <h2>Rekapitulasi Total Basis Data</h2>
-            <p>
-              Tersimpan {totalPemasukanAll} transaksi pemasukan dan {totalPengeluaranAll} biaya
-              operasional di penyimpanan lokal.
-            </p>
+            <p>Tersimpan {totalPemasukanAll} transaksi pemasukan dan {totalPengeluaranAll} biaya operasional di penyimpanan lokal.</p>
           </div>
         </section>
       </div>
@@ -282,7 +198,6 @@ export default function LaporanPage() {
           overflow: hidden;
         }
 
-        /* ── Decorative Background Glows ── */
         .laporan-bg-glow {
           position: fixed;
           border-radius: 50%;
@@ -292,33 +207,20 @@ export default function LaporanPage() {
           opacity: 0.2;
           animation: pulse 10s infinite alternate;
         }
-
         .glow-laporan-1 {
-          width: 500px;
-          height: 500px;
+          width: 500px; height: 500px;
           background: radial-gradient(circle, var(--color-primary), transparent 70%);
-          top: -100px;
-          right: -100px;
+          top: -100px; right: -100px;
         }
-
         .glow-laporan-2 {
-          width: 400px;
-          height: 400px;
+          width: 400px; height: 400px;
           background: radial-gradient(circle, #8b5cf6, transparent 70%);
-          bottom: 100px;
-          left: -100px;
+          bottom: 100px; left: -100px;
           animation-delay: 3s;
         }
-
         @keyframes pulse {
-          0% {
-            transform: translateY(0) scale(1);
-            opacity: 0.15;
-          }
-          100% {
-            transform: translateY(20px) scale(1.08);
-            opacity: 0.25;
-          }
+          0%   { transform: translateY(0) scale(1);    opacity: 0.15; }
+          100% { transform: translateY(20px) scale(1.08); opacity: 0.25; }
         }
 
         .laporan-container {
@@ -338,7 +240,6 @@ export default function LaporanPage() {
         }
 
         .page-eyebrow {
-          font-family: var(--font-body);
           font-size: 0.75rem;
           font-weight: 800;
           color: var(--color-primary-dim);
@@ -346,11 +247,12 @@ export default function LaporanPage() {
           margin-bottom: 0.5rem;
         }
 
+        /* ✅ FIX: ganti #ffffff → var(--color-text) */
         .page-header h1 {
           font-family: var(--font-display);
           font-size: clamp(2rem, 3.5vw, 2.75rem);
           font-weight: 800;
-          color: #ffffff;
+          color: var(--color-text);
           margin: 0;
           letter-spacing: -0.8px;
           line-height: 1.1;
@@ -367,7 +269,6 @@ export default function LaporanPage() {
           max-width: 560px;
         }
 
-        /* ── Live Badge ── */
         .live-badge {
           display: inline-flex;
           align-items: center;
@@ -381,53 +282,41 @@ export default function LaporanPage() {
           vertical-align: middle;
           transition: all 0.4s ease;
         }
-
         .live-badge--on {
           background: rgba(16, 185, 129, 0.12);
           border: 1px solid rgba(16, 185, 129, 0.3);
-          color: var(--color-success, #10b981);
+          color: var(--color-success);
         }
-
         .live-badge--off {
-          background: rgba(255, 255, 255, 0.04);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
           color: var(--color-text-muted);
         }
-
         .live-dot {
-          width: 7px;
-          height: 7px;
+          width: 7px; height: 7px;
           border-radius: 50%;
           background: currentColor;
           flex-shrink: 0;
         }
-
-        .live-badge--on .live-dot {
-          animation: livePulse 1.5s infinite;
-        }
-
+        .live-badge--on .live-dot { animation: livePulse 1.5s infinite; }
         @keyframes livePulse {
           0%, 100% { opacity: 1; transform: scale(1); }
-          50% { opacity: 0.4; transform: scale(0.75); }
+          50%       { opacity: 0.4; transform: scale(0.75); }
         }
 
-        /* Period selector card */
+        /* ✅ FIX: period card pakai var */
         .period-card {
           display: flex;
           align-items: center;
           gap: 12px;
           padding: 12px 20px;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.05);
           flex-wrap: wrap;
         }
-
         .period-label {
           display: flex;
           flex-direction: column;
           gap: 4px;
         }
-
         .period-label span {
           font-size: 0.65rem;
           font-weight: 800;
@@ -435,23 +324,21 @@ export default function LaporanPage() {
           text-transform: uppercase;
           letter-spacing: 0.8px;
         }
-
+        /* ✅ FIX: input pakai var */
         .period-label input {
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
           border-radius: 8px;
           padding: 8px 12px;
-          color: #ffffff;
+          color: var(--color-text);
           font-size: 0.85rem;
           outline: none;
           transition: all 0.25s ease;
         }
-
         .period-label input:focus {
           border-color: var(--color-primary-dim);
           box-shadow: 0 0 10px rgba(99, 102, 241, 0.15);
         }
-
         .period-connector {
           font-size: 0.85rem;
           color: var(--color-text-muted);
@@ -459,13 +346,11 @@ export default function LaporanPage() {
           padding-top: 14px;
         }
 
-        /* Summary Stats Cards Grid */
         .summary-grid {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
           gap: 1.5rem;
         }
-
         .summary-card {
           padding: 24px;
           display: flex;
@@ -473,16 +358,12 @@ export default function LaporanPage() {
           gap: 6px;
           position: relative;
         }
-
         .summary-card::before {
           content: "";
           position: absolute;
-          left: 0;
-          top: 0;
-          width: 4px;
-          height: 100%;
+          left: 0; top: 0;
+          width: 4px; height: 100%;
         }
-
         .summary-card span {
           color: var(--color-text-muted);
           font-size: 0.8rem;
@@ -490,78 +371,48 @@ export default function LaporanPage() {
           text-transform: uppercase;
           letter-spacing: 0.8px;
         }
-
         .summary-card strong {
           font-family: var(--font-display);
           font-size: 1.85rem;
           font-weight: 800;
           letter-spacing: -0.5px;
         }
+        .summary-card--income::before  { background: var(--color-primary); }
+        .summary-card--income strong   { color: var(--color-primary-dim); }
+        .summary-card--expense::before { background: var(--color-danger); }
+        .summary-card--expense strong  { color: var(--color-danger); }
+        .summary-card--profit::before  { background: var(--color-success); }
+        .summary-card--profit strong   { color: var(--color-success); }
+        .summary-card--loss::before    { background: var(--color-danger); }
+        .summary-card--loss strong     { color: var(--color-danger); }
 
-        .summary-card--income::before {
-          background: var(--color-primary);
-        }
-        .summary-card--income strong {
-          color: var(--color-primary-dim);
-          text-shadow: 0 0 10px rgba(99, 102, 241, 0.15);
-        }
-
-        .summary-card--expense::before {
-          background: var(--color-danger);
-        }
-        .summary-card--expense strong {
-          color: var(--color-danger);
-          text-shadow: 0 0 10px rgba(244, 63, 94, 0.15);
-        }
-
-        .summary-card--profit::before {
-          background: var(--color-success);
-        }
-        .summary-card--profit strong {
-          color: var(--color-success);
-          text-shadow: 0 0 10px rgba(16, 185, 129, 0.15);
-        }
-
-        .summary-card--loss::before {
-          background: var(--color-danger);
-        }
-        .summary-card--loss strong {
-          color: var(--color-danger);
-          text-shadow: 0 0 10px rgba(244, 63, 94, 0.15);
-        }
-
-        /* Breakdown side-by-side grid */
         .breakdown-grid {
           display: grid;
           grid-template-columns: 1fr 1fr;
           gap: 1.5rem;
         }
-
-        .breakdown-card {
-          padding: 24px;
-        }
-
+        .breakdown-card { padding: 24px; }
         .breakdown-header {
           display: flex;
           justify-content: space-between;
           align-items: center;
           margin-bottom: 1.5rem;
         }
-
+        /* ✅ FIX: heading pakai var */
         .breakdown-header h2 {
           margin: 0;
           font-family: var(--font-display);
           font-size: 1.1rem;
           font-weight: 700;
-          color: #ffffff;
+          color: var(--color-text);
         }
-
+        /* ✅ FIX: badge pakai var */
         .breakdown-header span {
           color: var(--color-text-muted);
           font-size: 0.8rem;
           font-weight: 500;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
           padding: 3px 8px;
           border-radius: 6px;
         }
@@ -571,63 +422,42 @@ export default function LaporanPage() {
           flex-direction: column;
           gap: 10px;
         }
-
+        /* ✅ FIX: item pakai var */
         .breakdown-item {
           position: relative;
           display: flex;
           justify-content: space-between;
           align-items: center;
           padding: 14px 16px;
-          background: rgba(255, 255, 255, 0.01);
-          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
           border-radius: 12px;
           overflow: hidden;
           transition: all 0.2s ease;
           animation: fadeSlideUp 0.4s both;
         }
-
         @keyframes fadeSlideUp {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          from { opacity: 0; transform: translateY(10px); }
+          to   { opacity: 1; transform: translateY(0); }
         }
-
         .breakdown-item:hover {
-          border-color: rgba(255, 255, 255, 0.08);
-          background: rgba(255, 255, 255, 0.03);
+          border-color: var(--color-border-hover);
+          background: var(--color-surface);
         }
-
         .breakdown-item__progress {
           position: absolute;
-          left: 0;
-          bottom: 0;
+          left: 0; bottom: 0;
           height: 3px;
           background: linear-gradient(90deg, transparent, var(--color-primary-dim));
           opacity: 0.4;
           transition: width 0.8s ease-out;
         }
-
         .breakdown-item__progress--expense {
           background: linear-gradient(90deg, transparent, var(--color-danger));
         }
-
-        .breakdown-item__name {
-          font-weight: 600;
-          color: #e2e8f0;
-          z-index: 1;
-        }
-
-        .breakdown-item__value {
-          font-family: var(--font-display);
-          font-weight: 700;
-          color: #ffffff;
-          z-index: 1;
-        }
+        /* ✅ FIX: teks item pakai var */
+        .breakdown-item__name  { font-weight: 600; color: var(--color-text); z-index: 1; }
+        .breakdown-item__value { font-family: var(--font-display); font-weight: 700; color: var(--color-text); z-index: 1; }
 
         .empty-text {
           color: var(--color-text-muted);
@@ -638,335 +468,45 @@ export default function LaporanPage() {
           font-style: italic;
         }
 
-        /* Recap Traffic Card */
+        /* ✅ FIX: traffic card pakai var */
         .traffic-card {
           padding: 20px 24px;
           display: flex;
           align-items: center;
           gap: 16px;
         }
-
         .traffic-icon {
           font-size: 1.75rem;
-          width: 48px;
-          height: 48px;
+          width: 48px; height: 48px;
           border-radius: 12px;
-          background: rgba(255, 255, 255, 0.03);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
+          display: flex; align-items: center; justify-content: center;
           flex-shrink: 0;
         }
-
         .traffic-card h2 {
           margin: 0 0 3px;
           font-family: var(--font-display);
           font-size: 1.02rem;
           font-weight: 700;
-          color: #ffffff;
+          color: var(--color-text);
         }
-
-        .traffic-card p {
-          margin: 0;
-          color: var(--color-text-muted);
-          font-size: 0.88rem;
-        }
-
-        @media (max-width: 1024px) {
-          .laporan-container {
-            gap: 1.5rem;
-          }
-          .summary-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 1.2rem;
-          }
-          .summary-card {
-            padding: 20px;
-          }
-          .summary-card strong {
-            font-size: 1.5rem;
-          }
-        }
+        .traffic-card p { margin: 0; color: var(--color-text-muted); font-size: 0.88rem; }
 
         @media (max-width: 900px) {
-          .laporan-page {
-            padding: 1.5rem 0 4rem;
-          }
-          .laporan-container {
-            gap: 1.25rem;
-          }
-          .summary-grid,
-          .breakdown-grid {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-          }
-          .period-card {
-            width: 100%;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 10px;
-          }
-          .period-label {
-            flex: 1;
-            min-width: 150px;
-          }
-          .period-label input {
-            width: 100%;
-          }
-          .period-connector {
-            display: none;
-          }
-          .page-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
-          }
-          .page-header h1 {
-            font-size: clamp(1.6rem, 2.5vw, 2rem);
-          }
-          .glow-laporan-1,
-          .glow-laporan-2 {
-            filter: blur(80px);
-            width: 350px;
-            height: 350px;
-          }
+          .summary-grid, .breakdown-grid { grid-template-columns: 1fr; gap: 1rem; }
+          .period-card { width: 100%; flex-wrap: wrap; gap: 10px; }
+          .period-label { flex: 1; min-width: 150px; }
+          .period-label input { width: 100%; }
+          .period-connector { display: none; }
+          .page-header { flex-direction: column; align-items: flex-start; }
         }
-
         @media (max-width: 768px) {
-          .laporan-page {
-            padding: 1.25rem 0 3.5rem;
-          }
-          .laporan-container {
-            gap: 1rem;
-          }
-          .page-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 0.75rem;
-          }
-          .page-eyebrow {
-            font-size: 0.65rem;
-            margin-bottom: 0.3rem;
-            letter-spacing: 1.5px;
-          }
-          .page-header h1 {
-            font-size: clamp(1.4rem, 2vw, 1.8rem);
-            letter-spacing: -0.6px;
-            gap: 0.5rem;
-          }
-          .page-description {
-            font-size: 0.85rem;
-          }
-          .period-card {
-            flex-direction: column;
-            padding: 12px 16px;
-            gap: 8px;
-          }
-          .period-label {
-            width: 100%;
-          }
-          .period-label span {
-            font-size: 0.6rem;
-            letter-spacing: 0.5px;
-          }
-          .period-label input {
-            padding: 6px 10px;
-            font-size: 0.8rem;
-            border-radius: 6px;
-          }
-          .summary-grid {
-            grid-template-columns: 1fr;
-            gap: 0.875rem;
-          }
-          .summary-card {
-            padding: 16px;
-          }
-          .summary-card span {
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-          }
-          .summary-card strong {
-            font-size: 1.3rem;
-          }
-          .breakdown-grid {
-            gap: 0.875rem;
-          }
-          .breakdown-card {
-            padding: 18px;
-          }
-          .breakdown-header h2 {
-            font-size: 1rem;
-          }
-          .breakdown-header span {
-            font-size: 0.75rem;
-            padding: 2px 6px;
-          }
-          .breakdown-item {
-            padding: 12px 14px;
-            border-radius: 10px;
-          }
-          .breakdown-item__progress {
-            height: 2px;
-          }
-          .empty-text {
-            font-size: 0.85rem;
-            padding: 1.5rem 0;
-          }
-          .traffic-card {
-            flex-direction: column;
-            align-items: flex-start;
-            padding: 16px;
-            gap: 12px;
-          }
-          .traffic-icon {
-            width: 40px;
-            height: 40px;
-            font-size: 1.5rem;
-          }
-          .traffic-card h2 {
-            font-size: 0.95rem;
-          }
-          .traffic-card p {
-            font-size: 0.8rem;
-          }
+          .summary-card strong { font-size: 1.5rem; }
+          .traffic-card { flex-direction: column; align-items: flex-start; }
         }
-
-        @media (max-width: 640px) {
-          .laporan-page {
-            padding: 1rem 0 3rem;
-          }
-          .laporan-container {
-            gap: 0.875rem;
-          }
-          .page-header h1 {
-            font-size: clamp(1.2rem, 1.8vw, 1.6rem);
-          }
-          .period-card {
-            padding: 10px 14px;
-            gap: 6px;
-            flex-direction: column;
-          }
-          .period-label {
-            width: 100%;
-          }
-          .period-label span {
-            font-size: 0.6rem;
-          }
-          .period-label input {
-            padding: 5px 8px;
-            font-size: 0.75rem;
-          }
-          .summary-grid {
-            gap: 0.75rem;
-          }
-          .summary-card {
-            padding: 14px;
-          }
-          .summary-card span {
-            font-size: 0.7rem;
-          }
-          .summary-card strong {
-            font-size: 1.2rem;
-          }
-          .breakdown-card {
-            padding: 14px;
-          }
-          .breakdown-header {
-            margin-bottom: 1rem;
-            gap: 10px;
-          }
-          .breakdown-header h2 {
-            font-size: 0.9rem;
-          }
-          .breakdown-list {
-            gap: 8px;
-          }
-          .breakdown-item {
-            padding: 10px 12px;
-            gap: 6px;
-            font-size: 0.8rem;
-          }
-          .breakdown-item__name {
-            font-size: 0.8rem;
-          }
-          .breakdown-item__value {
-            font-size: 0.8rem;
-          }
-          .traffic-card {
-            padding: 14px;
-            gap: 10px;
-          }
-          .glow-laporan-1,
-          .glow-laporan-2 {
-            filter: blur(70px);
-            width: 280px;
-            height: 280px;
-            opacity: 0.12;
-          }
-        }
-
         @media (max-width: 480px) {
-          .laporan-page {
-            padding: 0.75rem 0 2.5rem;
-          }
-          .page-header h1 {
-            font-size: 1.3rem;
-          }
-          .page-description {
-            font-size: 0.8rem;
-          }
-          .period-card {
-            padding: 8px 12px;
-          }
-          .period-label input {
-            font-size: 0.7rem;
-            padding: 4px 6px;
-          }
-          .summary-grid {
-            gap: 0.6rem;
-          }
-          .summary-card {
-            padding: 12px;
-          }
-          .summary-card span {
-            font-size: 0.65rem;
-          }
-          .summary-card strong {
-            font-size: 1.1rem;
-          }
-          .breakdown-card {
-            padding: 12px;
-          }
-          .breakdown-header {
-            margin-bottom: 0.75rem;
-          }
-          .breakdown-header h2 {
-            font-size: 0.85rem;
-          }
-          .breakdown-header span {
-            font-size: 0.65rem;
-            padding: 1px 4px;
-          }
-          .breakdown-item {
-            padding: 8px 10px;
-            font-size: 0.7rem;
-          }
-          .traffic-card {
-            padding: 12px;
-          }
-          .traffic-icon {
-            width: 36px;
-            height: 36px;
-            font-size: 1.3rem;
-          }
-          .traffic-card h2 {
-            font-size: 0.85rem;
-            margin: 0 0 2px;
-          }
-          .traffic-card p {
-            font-size: 0.75rem;
-          }
+          .summary-card strong { font-size: 1.1rem; }
         }
       `}</style>
     </div>

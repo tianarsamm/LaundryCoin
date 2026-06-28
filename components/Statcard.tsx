@@ -165,7 +165,7 @@ export default function StatCard({
           font-family: var(--font-display);
           font-size: 24px;
           font-weight: 800;
-          color: #ffffff;
+          color: var(--color-text);
           letter-spacing: -0.5px;
           line-height: 1.15;
           white-space: nowrap;
@@ -173,33 +173,11 @@ export default function StatCard({
           text-overflow: ellipsis;
         }
 
-        .statcard--success .statcard__value {
-          background: linear-gradient(135deg, #ffffff, var(--color-success));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .statcard--danger .statcard__value {
-          background: linear-gradient(135deg, #ffffff, var(--color-danger));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .statcard--warning .statcard__value {
-          background: linear-gradient(135deg, #ffffff, var(--color-warning));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
-
-        .statcard--default .statcard__value {
-          background: linear-gradient(135deg, #ffffff, var(--color-primary-dim));
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-        }
+        /* Warna solid per variant */
+.statcard--success .statcard__value { color: var(--color-success); }
+.statcard--danger  .statcard__value { color: var(--color-danger);  }
+.statcard--warning .statcard__value { color: var(--color-warning); }
+.statcard--default .statcard__value { color: var(--color-primary-dim); }
 
         .statcard__sublabel {
           display: flex;

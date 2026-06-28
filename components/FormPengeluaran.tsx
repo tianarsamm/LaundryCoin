@@ -2,11 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { addPengeluaran } from "@/lib/supabase/storage";
-import {
-  LIST_KATEGORI_PENGELUARAN,
-  formatRupiah,
-  getTanggalHariIni,
-} from "@/lib/constants";
+import { LIST_KATEGORI_PENGELUARAN, formatRupiah, getTanggalHariIni } from "@/lib/constants";
 import type { KategoriPengeluaran } from "@/lib/supabase/types";
 
 interface FormPengeluaranProps {
@@ -22,9 +18,7 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (jumlah <= 0) return;
-
     addPengeluaran({ tanggal, kategori, keterangan, jumlah });
-
     setTanggal(getTanggalHariIni());
     setKategori(LIST_KATEGORI_PENGELUARAN[0]);
     setKeterangan("");
@@ -38,46 +32,24 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
       <form onSubmit={handleSubmit} className="form-grid">
         <label className="field">
           <span>Tanggal Pengeluaran</span>
-          <input
-            type="date"
-            value={tanggal}
-            onChange={(event) => setTanggal(event.target.value)}
-          />
+          <input type="date" value={tanggal} onChange={(e) => setTanggal(e.target.value)} />
         </label>
 
         <label className="field">
           <span>Kategori</span>
-          <select
-            value={kategori}
-            onChange={(event) => setKategori(event.target.value as KategoriPengeluaran)}
-          >
-            {LIST_KATEGORI_PENGELUARAN.map((item) => (
-              <option key={item} value={item}>
-                {item}
-              </option>
-            ))}
+          <select value={kategori} onChange={(e) => setKategori(e.target.value as KategoriPengeluaran)}>
+            {LIST_KATEGORI_PENGELUARAN.map((item) => <option key={item} value={item}>{item}</option>)}
           </select>
         </label>
 
         <label className="field">
           <span>Keterangan</span>
-          <input
-            type="text"
-            value={keterangan}
-            onChange={(event) => setKeterangan(event.target.value)}
-            placeholder="Contoh: Beli sabun detergen cair"
-          />
+          <input type="text" value={keterangan} onChange={(e) => setKeterangan(e.target.value)} placeholder="Contoh: Beli sabun detergen cair" />
         </label>
 
         <label className="field">
           <span>Jumlah Biaya</span>
-          <input
-            type="number"
-            min={0}
-            value={jumlah || ""}
-            onChange={(event) => setJumlah(Number(event.target.value))}
-            placeholder="Rp 0"
-          />
+          <input type="number" min={0} value={jumlah || ""} onChange={(e) => setJumlah(Number(e.target.value))} placeholder="Rp 0" />
         </label>
 
         <div className="summary-box">
@@ -99,28 +71,18 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
           width: 100%;
         }
 
+        /* ✅ FIX: pakai var */
         .form-pengeluaran h2 {
           margin: 0;
           font-family: var(--font-display);
           font-size: 1.25rem;
           font-weight: 700;
-          color: #ffffff;
+          color: var(--color-text);
           letter-spacing: -0.2px;
         }
 
-        .form-grid {
-          display: grid;
-          gap: 1.25rem;
-          min-width: 0;
-          width: 100%;
-        }
-
-        .field {
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
-          min-width: 0;
-        }
+        .form-grid { display: grid; gap: 1.25rem; min-width: 0; width: 100%; }
+        .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
 
         .field span {
           font-family: var(--font-body);
@@ -131,13 +93,14 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
           letter-spacing: 0.8px;
         }
 
+        /* ✅ FIX: input/select pakai var */
         .field input,
         .field select {
           width: 100%;
           box-sizing: border-box;
-          background: rgba(255, 255, 255, 0.02);
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          color: #ffffff;
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
+          color: var(--color-text);
           border-radius: var(--radius-sm);
           padding: 12px 14px;
           outline: none;
@@ -155,19 +118,20 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
           padding-right: 40px;
         }
 
+        /* ✅ FIX: option pakai var */
         .field select option {
-          background: #0d1322;
-          color: #ffffff;
+          background: var(--color-bg-alt, #0d1322);
+          color: var(--color-text);
         }
 
         .field input:focus,
         .field select:focus {
           border-color: rgba(244, 63, 94, 0.4);
           box-shadow: 0 0 15px rgba(244, 63, 94, 0.15);
-          background: rgba(255, 255, 255, 0.04);
+          background: var(--color-surface);
         }
 
-        /* Summary Box */
+        /* ✅ FIX: summary box pakai var */
         .summary-box {
           display: flex;
           justify-content: space-between;
@@ -175,32 +139,25 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
           gap: 8px;
           padding: 18px;
           border-radius: 12px;
-          background: rgba(255, 255, 255, 0.01);
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          background: var(--color-surface-2);
+          border: 1px solid var(--color-border);
           font-size: 0.88rem;
           min-width: 0;
           width: 100%;
           box-sizing: border-box;
         }
 
-        .summary-box span {
-          color: var(--color-text-muted);
-          font-weight: 500;
-          flex-shrink: 0;
-        }
-
+        .summary-box span { color: var(--color-text-muted); font-weight: 500; flex-shrink: 0; }
         .summary-box strong {
           font-family: var(--font-display);
           font-size: 1.15rem;
           font-weight: 800;
           color: var(--color-danger);
-          text-shadow: 0 0 8px rgba(244, 63, 94, 0.2);
           text-align: right;
           word-break: break-all;
           min-width: 0;
         }
 
-        /* Submit Button */
         .submit-button {
           width: 100%;
           box-sizing: border-box;
@@ -216,73 +173,30 @@ export default function FormPengeluaran({ onSuccess }: FormPengeluaranProps) {
           overflow: hidden;
           text-overflow: ellipsis;
         }
+        .submit-button:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(244, 63, 94, 0.45); filter: brightness(1.1); }
+        .submit-button:active:not(:disabled) { transform: translateY(0); }
 
-        .submit-button:hover:not(:disabled) {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(244, 63, 94, 0.45);
-          filter: brightness(1.1);
-        }
-
-        .submit-button:active:not(:disabled) {
-          transform: translateY(0);
-        }
-
+        /* ✅ FIX: disabled pakai var */
         .submit-button:disabled {
-          background: rgba(255, 255, 255, 0.04);
+          background: var(--color-surface-2);
           color: var(--color-text-muted);
-          border: 1px solid rgba(255, 255, 255, 0.05);
+          border: 1px solid var(--color-border);
           box-shadow: none;
           cursor: not-allowed;
         }
 
         @media (max-width: 640px) {
-          .form-grid {
-            gap: 1rem;
-          }
-
-          .form-pengeluaran h2 {
-            font-size: 1.1rem;
-          }
-
-          .field input,
-          .field select {
-            padding: 10px 12px;
-            font-size: 0.9rem;
-          }
-
-          .field select {
-            padding-right: 36px;
-          }
-
-          .summary-box {
-            padding: 14px;
-          }
-
-          .summary-box strong {
-            font-size: 1rem;
-          }
-
-          .submit-button {
-            padding: 13px 10px;
-            font-size: 0.88rem;
-          }
+          .form-grid { gap: 1rem; }
+          .form-pengeluaran h2 { font-size: 1.1rem; }
+          .field input, .field select { padding: 10px 12px; font-size: 0.9rem; }
+          .summary-box { padding: 14px; }
+          .summary-box strong { font-size: 1rem; }
+          .submit-button { padding: 13px 10px; font-size: 0.88rem; }
         }
-
         @media (max-width: 380px) {
-          .field input,
-          .field select {
-            padding: 9px 10px;
-            font-size: 0.85rem;
-          }
-
-          .summary-box strong {
-            font-size: 0.95rem;
-          }
-
-          .submit-button {
-            font-size: 0.82rem;
-            padding: 12px 8px;
-          }
+          .field input, .field select { padding: 9px 10px; font-size: 0.85rem; }
+          .summary-box strong { font-size: 0.95rem; }
+          .submit-button { font-size: 0.82rem; padding: 12px 8px; }
         }
       `}</style>
     </div>

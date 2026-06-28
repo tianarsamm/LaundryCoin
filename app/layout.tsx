@@ -5,6 +5,7 @@ import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { NotificationProvider } from "@/context/NotificationContext";
 import { ToastContainer } from "@/components/ToastContainer";
 import NotificationSetup from "@/components/NotificationSetup";
+import { ThemeProvider } from "@/context/ThemeContext";
 import "./globals.css";
 
 const sora = Sora({
@@ -43,18 +44,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="id" className={`${sora.variable} ${dmSans.variable}`}>
+    <html
+      lang="id"
+      className={`${sora.variable} ${dmSans.variable}`}
+      suppressHydrationWarning 
+    >
       <body className="layout">
         <ServiceWorkerRegister />
         <NotificationSetup />
-        <NotificationProvider>
-          {/* Toast in-app — muncul di pojok kanan bawah navbar, tidak blocking */}
-          <ToastContainer />
-          <Navbar />
-          <main className="layout__main">
-            {children}
-          </main>
-        </NotificationProvider>
+        <ThemeProvider>
+          <NotificationProvider>
+            <ToastContainer />
+            <Navbar />
+            <main className="layout__main">
+              {children}
+            </main>
+          </NotificationProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

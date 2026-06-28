@@ -363,7 +363,7 @@ export default function DashboardPage() {
           font-family: var(--font-display);
           font-size: clamp(1.9rem, 3.5vw, 2.75rem);
           font-weight: 800;
-          color: #fff;
+          color: var(--color-text);;
           letter-spacing: -0.8px;
           line-height: 1.1;
         }
@@ -461,7 +461,7 @@ export default function DashboardPage() {
           font-family: var(--font-display);
           font-size: 1.05rem;
           font-weight: 700;
-          color: #fff;
+          color: var(--color-text);;
           letter-spacing: -0.2px;
         }
         .card-header__dot {
@@ -527,7 +527,7 @@ export default function DashboardPage() {
           margin: 0 0 2px;
           font-weight: 700;
           font-size: 0.88rem;
-          color: #fff;
+          color: var(--color-text);;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
